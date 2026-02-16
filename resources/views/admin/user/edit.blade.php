@@ -1,6 +1,6 @@
 {{-- File: resources/views/user/edit.blade.php --}}
 <div class="bg-white rounded-2xl overflow-hidden">
-    <div class="py-6 border-b border-gray-200 text-center">
+    <div class="py-6 border-b border-gray-100 text-center sticky top-0 bg-white z-10">
         <h3 class="text-lg font-bold text-gray-800">Edit Pengguna: {{ $user->username }}</h3>
     </div>
 
@@ -104,16 +104,16 @@
             </div>
 
             {{-- Tombol Aksi (Footer) --}}
-            <div class="flex gap-4 pt-6">
+            <div class="flex justify-between items-center pt-10 mt-4">
                 {{-- Panggil closeModal dengan ID modal dan ID form yang sesuai --}}
                 <button type="button"
                     onclick="openDiscardConfirmation('Pengguna', 'modalEdit_{{ $user->id }}', 'formEditPengguna_{{ $user->id }}')"
-                    class="flex-1 py-3 border border-birua text-birua rounded-xl text-xs font-bold hover:bg-gray-50 transition shadow-sm">
+                    class="px-12 py-3 border border-birua text-birua rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                     Batal
                 </button>
                 <button type="submit"
-                    class="flex-1 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:bg-biruc transition shadow-lg shadow-blue-100">
-                    Perbarui
+                    class="px-12 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:opacity-90 transition shadow-lg shadow-birua/20">
+                    Simpan
                 </button>
             </div>
         </div>

@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit Bisnis</title>
-    @vite('resources/css/app.css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-
 <body class="bg-[#f8fafc] font-habanera">
     @extends('layout.admin')
 
@@ -100,28 +89,29 @@
                             <thead>
                                 <tr class="bg-kuning text-black text-[11px] font-bold text-center tracking-wider">
                                     <th class="py-4 px-10 border-b border-gray-200">Logo</th>
-                                    <th class="py-4 px-8 border-b border-gray-200">Nama Unit Bisnis</th>
+                                    <th class="py-4 px-12 border-b border-gray-200">Nama Unit Bisnis</th>
                                     <th class="py-4 px-16 border-b border-gray-200">Deskripsi</th>
                                     <th class="py-4 px-8 border-b border-gray-200">Layanan</th>
                                     <th class="py-4 px-16 border-b border-gray-200">Gambar</th>
                                     <th class="py-4 px-8 border-b border-gray-200">Link Website</th>
                                     <th class="py-4 px-8 border-b border-gray-200">Link Media Sosial</th>
+                                    <th class="py-4 px-10 border-b border-gray-200">Terakhir Diedit Oleh</th>
                                     <th class="py-4 px-8 border-b border-gray-200">Status</th>
                                     <th class="py-4 px-8 border-b border-gray-200">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="text-[12px]">
-                                @foreach ($unitBisnis as $ub)
+                                @forelse ($unitBisnis as $ub)
                                     <tr class="hover:bg-gray-50 transition text-center group">
                                         {{-- Logo (Sticky Left) --}}
-                                        <td class="py-3 px-8 border-b border-gray-100 ">
+                                        <td class="py-3 px-3 border-b border-gray-100 ">
                                             <img src="{{ asset('storage/' . $ub->logo_ub) }}"
-                                                class="w-10 h-10 object-contain mx-auto">
+                                                class="w-13 h-13 object-contain mx-auto">
                                         </td>
 
                                         {{-- Nama --}}
-                                        <td class="py-3 px-16 border-b border-gray-100 font-light text-gray-700 ">
-                                            {{ $ub->nama_ub }}
+                                        <td class="py-3 px-16 border-b border-gray-100 font-light text-gray-700">
+                                            <p class="w-32">{{ $ub->nama_ub }}</p>
                                         </td>
 
                                         {{-- Deskripsi --}}
@@ -177,22 +167,32 @@
                                             </a>
                                         </td>
 
-                                        {{-- Status --}}
-                                        <td class="py-3 px-6 border-b border-gray-100">
+                                        {{-- Terakhir Diedit Oleh --}}
+                                        <td class="py-4 px-8 text-xs font-light text-gray-700 min-w-[300px] max-w-[400px]">
+                                            {{ $ub->user->username ?? '-' }}
+                                        </td>
+
+                                        {{-- Status Unit Bisnis --}}
+                                        <td class="py-5 px-6 text-center border-b border-gray-100">
                                             <div
-                                                class="inline-flex items-center gap-2 border border-gray-300 rounded-full px-5 py-1.5 bg-white min-w-[120px] justify-center">
+                                                class="inline-flex items-center gap-2 border border-gray-300 rounded-full px-5 py-1.5 bg-white min-w-[125px] justify-center">
+                                                {{-- Dot Status --}}
                                                 <div
                                                     class="w-2.5 h-2.5 rounded-full {{ $ub->status == 'aktif' ? 'bg-aktif' : 'bg-nonaktif' }}">
                                                 </div>
-                                                <span class="font-bold text-xs capitalize">{{ $ub->status }}</span>
+                                                <span class="font-bold capitalize whitespace-nowrap ">
+                                                    {{ $ub->status }}
+                                                </span>
                                             </div>
                                         </td>
+
+
 
                                         {{-- Aksi --}}
                                         <td class="py-3 px-6 border-b border-gray-100 ">
                                             <div class="flex justify-center gap-2">
                                                 <button onclick="toggleModal('modalEditUB_{{ $ub->id_ub }}')"
-                                                    class="w-7 h-7 rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 shadow-sm transition">
+                                                    class="w-[30px] h-[30px] rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 transition shadow-sm">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
                                                         viewBox="0 0 24 24">
                                                         <path fill="currentColor"
@@ -203,7 +203,7 @@
                                                 </button>
                                                 <button type="button"
                                                     onclick="showDeleteConfirmation('{{ route('ub.destroy', $ub->id_ub) }}')"
-                                                    class="w-7 h-7 rounded-full bg-birud text-white flex items-center justify-center hover:bg-red-900 transition shadow-sm">
+                                                    class="w-8 h-8 rounded-full bg-birud text-white flex items-center justify-center hover:bg-red-900 transition shadow-sm">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                         viewBox="0 0 24 24">
                                                         <path fill="currentColor"
@@ -214,7 +214,30 @@
                                         </td>
                                     </tr>
                                     @include('admin.unitbisnis.edit')
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="py-18 text-center bg-white">
+                                            <div class="flex flex-col items-center">
+                                                {{-- Ikon --}}
+                                                <div class="mb-4 text-gray-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1"
+                                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                </div>
+                                                {{-- Teks --}}
+                                                <h3 class="text-gray-700 font-habanera font-bold text-base">Hasil Tidak
+                                                    Ditemukan</h3>
+                                                <p class="text-gray-500 font-habanera text-xs max-w-xs mx-auto mt-1">
+                                                    Maaf, kami tidak menemukan data yang sesuai dengan kriteria atau kata
+                                                    kunci Anda.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -254,6 +277,7 @@
 
         @include('layout.partials.delete_confirmation_modal')
         @include('layout.partials.success_notification')
+        @include('layout.partials.edit_confirmation')
         @include('admin.unitbisnis.tambah')
         @include('admin.unitbisnis.layanan')
 
@@ -269,21 +293,17 @@
                 // Bersihkan isi modal sebelumnya
                 listContainer.innerHTML = '';
 
-                // Logika parsing data (Handle jika data berupa string dipisah koma atau array)
-                let layananArray = [];
-                if (Array.isArray(layananData)) {
-                    layananArray = layananData;
-                } else if (typeof layananData === 'string') {
-                    layananArray = layananData.split(',').map(s => s.trim());
-                }
+                // Pastikan data adalah array
+                let layananArray = Array.isArray(layananData) ? layananData : [];
 
-                // Buat elemen visual sesuai foto (dashed border)
-                if (layananArray && layananArray.length > 0) {
+                if (layananArray.length > 0) {
                     layananArray.forEach(item => {
                         const div = document.createElement('div');
                         div.className =
-                            "w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium text-sm text-center";
-                        div.textContent = `<< ${item} >>`;
+                            "w-full p-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium text-xs text-center";
+
+                        div.textContent = `${item.nama_layanan}`;
+
                         listContainer.appendChild(div);
                     });
                 } else {
@@ -311,9 +331,15 @@
             }
 
             function getModalContentId(modalId) {
-                if (modalId.startsWith('modalEditUB_')) return `modalContentEditUB_${modalId.split('_')[1]}`;
+                // Jika modalId adalah "modalEditUB_12", maka split akan menghasilkan ["modalEditUB", "12"]
+                if (modalId.startsWith('modalEditUB_')) {
+                    return `modalContentEditUB_${modalId.split('_')[1]}`;
+                }
                 if (modalId === 'modalTambahUB') return 'modalContentTambahUB';
                 if (modalId === 'deleteConfirmationModal') return 'deleteConfirmationModalContent';
+                // ID konten untuk modal konfirmasi pembatalan (editConfirmation)
+                if (modalId === 'editConfirmation') return 'editConfirmationContent';
+                if (modalId === 'modalLayanan') return 'modalContentLayanan'; // Tambahkan ini
                 return null;
             }
 
@@ -354,6 +380,8 @@
                 const modal = document.getElementById('deleteConfirmationModal');
                 const content = document.getElementById('deleteConfirmationModalContent');
                 const deleteForm = document.getElementById('deleteForm');
+                const confirmBtn = document.getElementById('confirmDeleteButton'); // Ambil tombol Ya
+
                 if (modal && content) {
                     modal.classList.replace('hidden', 'flex');
                     setTimeout(() => {
@@ -361,7 +389,14 @@
                         content.classList.replace('opacity-0', 'opacity-100');
                     }, 10);
                 }
+
+                // Set action URL ke form
                 deleteForm.setAttribute('action', deleteUrl);
+
+                // Tambahkan event klik pada tombol 'Ya' untuk submit form
+                confirmBtn.onclick = function() {
+                    deleteForm.submit();
+                };
             }
 
             window.onclick = (e) => {
@@ -395,39 +430,95 @@
                 }
             };
 
-            // Fungsi untuk Modal TAMBAH
-            function addLayananFieldTambah() {
-                const container = document.getElementById('layananContainerTambah');
+
+            // Fungsi untuk Modal EDIT (Dynamic ID berdasarkan Unit Bisnis)
+            function addLayananFieldEdit(id) {
+                const container = document.getElementById(`layananContainerEdit_${id}`);
+                if (!container) {
+                    console.error("Container tidak ditemukan untuk ID: " + id);
+                    return;
+                }
+
                 const div = document.createElement('div');
                 div.className = 'flex items-center gap-2 mt-2';
                 div.innerHTML = `
-                    <input type="text" name="layanan[]" placeholder="Masukkan Nama Layanan"
-                        class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
-                    <button type="button" onclick="this.parentElement.remove()"
-                        class="bg-birue text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
-                `;
+            <input type="text" name="layanan[]" form="formEditUB_${id}" placeholder="Masukkan Layanan Baru"
+                class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
+            <button type="button" onclick="this.parentElement.remove()"
+                class="bg-birub text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                        viewBox="0 0 24 24">
+                                        <path fill="currentColor"
+                                            d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
+                                    </svg>
+            </button>
+        `;
                 container.appendChild(div);
             }
 
-            // Fungsi untuk Modal EDIT (Dinamis berdasarkan ID UB)
-            function addLayananFieldEdit(id) {
-                const container = document.getElementById(`layananContainerEdit_${id}`);
-                const div = document.createElement('div');
-                div.className = 'flex items-center gap-2 mt-2';
-                div.innerHTML = `
-                    <input type="text" name="nama_layanan[]" placeholder="Masukkan Layanan Baru"
-                        class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
-                    <button type="button" onclick="this.parentElement.remove()"
-                        class="bg-birue text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
-                    </button>
-                `;
-                container.appendChild(div);
+            // Fungsi untuk memicu Modal Konfirmasi Pembatalan Edit
+            function openDiscardConfirmation(contextText, modalToCloseId, formId) {
+                const discardModalId = 'editConfirmation'; // Menggunakan ID yang Anda tentukan
+                const confirmButtonId = 'confirmEditButton'; // ID tombol "Ya" dari modal yang Anda berikan
+
+                const contextSpan = document.getElementById('discardContextText'); // Asumsi ada elemen ini di partial view
+                const confirmButton = document.getElementById(confirmButtonId);
+
+                // 1. Menyimpan state modal dan form yang sedang aktif
+                lastActiveModalId = modalToCloseId;
+                formToResetId = formId;
+
+                // 2. Mengatur teks dinamis pada modal konfirmasi
+                if (contextSpan) {
+                    contextSpan.textContent = contextText;
+                }
+
+                // 3. Menampilkan modal konfirmasi pembatalan
+                const discardContentId = getModalContentId(discardModalId);
+                const modal = document.getElementById(discardModalId);
+                const content = document.getElementById(discardContentId);
+
+                if (modal && content) {
+                    modal.classList.replace('hidden', 'flex');
+                    setTimeout(() => {
+                        content.classList.replace('scale-95', 'scale-100');
+                        content.classList.replace('opacity-0', 'opacity-100');
+                    }, 10);
+                }
+
+                // 4. MENGHAPUS & Mengatur ulang fungsi tombol 'Ya' (confirmEditButton)
+                const newConfirmButton = confirmButton.cloneNode(true);
+                confirmButton.replaceWith(newConfirmButton);
+
+                newConfirmButton.onclick = function() {
+                    // A. Menutup modal konfirmasi pembatalan
+                    closeModal(discardModalId);
+
+                    if (lastActiveModalId && formToResetId) {
+                        // B. Menutup modal edit dan mereset form yang ditargetkan
+                        closeModal(lastActiveModalId, formToResetId, true);
+                    }
+
+                    // C. Membersihkan state
+                    lastActiveModalId = null;
+                    formToResetId = null;
+                };
+
+                const noButton = document.querySelector(`#${discardModalId} button.bg-red-600`);
+                if (noButton) {
+                    // Clone dan replace untuk menghindari event listener duplikat
+                    const newNoButton = noButton.cloneNode(true);
+                    noButton.replaceWith(newNoButton);
+
+                    newNoButton.onclick = function() {
+                        closeModal(discardModalId);
+                        if (lastActiveModalId) {
+                            // Membuka kembali modal edit yang sedang aktif
+                            toggleModal(lastActiveModalId);
+                        }
+                    };
+                }
             }
         </script>
     @endsection
 </body>
-
-</html>

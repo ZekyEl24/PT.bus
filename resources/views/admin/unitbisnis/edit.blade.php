@@ -1,11 +1,14 @@
+{{-- ========================================== --}}
+{{-- MODAL EDIT UNIT BISNIS (POP-UP) --}}
+{{-- ========================================== --}}
 <div id="modalEditUB_{{ $ub->id_ub }}"
-    class="fixed inset-0 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4 z-40">
+    class="fixed inset-0 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4 z-50">
 
     <div id="modalContentEditUB_{{ $ub->id_ub }}"
-        class="bg-white rounded-[15px] shadow-2xl w-full max-w-[850px] transform transition-all scale-95 opacity-0 duration-300 max-h-[95vh] overflow-y-auto">
+        class="bg-white rounded-[20px] shadow-2xl w-full max-w-[850px] transform transition-all scale-95 opacity-0 duration-300 max-h-[95vh] overflow-y-auto scrollbar-hide text-left">
 
         {{-- Judul Modal --}}
-        <div class="py-6 border-b border-gray-100 text-center relative">
+        <div class="py-6 border-b border-gray-100 text-center sticky top-0 bg-white z-10">
             <h3 class="text-lg font-bold text-gray-800">Edit Unit Bisnis: {{ $ub->nama_ub }}</h3>
             <button type="button"
                 onclick="closeModal('modalEditUB_{{ $ub->id_ub }}', 'formEditUB_{{ $ub->id_ub }}')"
@@ -39,14 +42,12 @@
 
                 {{-- Sisi Kanan: Upload Logo --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-2">Logo Unit Bisnis <span
-                            class="text-gray-400 font-normal italic">(Kosongkan jika tidak diganti)</span></label>
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Logo Unit Bisnis</label>
                     <div class="relative group">
                         <label for="inputLogoEdit_{{ $ub->id_ub }}" class="cursor-pointer">
                             <div id="previewContainerLogo_{{ $ub->id_ub }}"
                                 class="w-full h-[180px] border-2 border-dashed border-gray-400/70 rounded-xl flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition relative overflow-hidden">
 
-                                {{-- Preview existing logo --}}
                                 <img id="previewLogo_{{ $ub->id_ub }}" src="{{ asset('storage/' . $ub->logo_ub) }}"
                                     class="max-w-[90%] max-h-[90%] object-contain">
                             </div>
@@ -63,13 +64,11 @@
 
                 {{-- Baris Tengah: Foto Utama --}}
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-gray-700 mb-2">Foto Unit Bisnis <span
-                            class="text-gray-400 font-normal italic">(Kosongkan jika tidak diganti)</span></label>
+                    <label class="block text-xs font-bold text-gray-700 mb-2">Foto Unit Bisnis</label>
                     <div class="flex flex-col md:flex-row gap-4">
                         <div id="previewContainerFoto_{{ $ub->id_ub }}"
                             class="flex-1 h-40 border-2 border-dashed border-gray-400/70 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
 
-                            {{-- Preview existing main photo --}}
                             <img id="previewFoto_{{ $ub->id_ub }}" src="{{ asset('storage/' . $ub->gambar_ub) }}"
                                 class="max-w-[95%] max-h-[95%] object-contain">
                         </div>
@@ -102,20 +101,21 @@
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-gray-700 mb-2">Layanan</label>
                     <div id="layananContainerEdit_{{ $ub->id_ub }}" class="space-y-3">
-                        @foreach ($ub->layanan as $item)
+                        @forelse ($ub->layanan as $item)
                             <div class="flex items-center gap-2">
-                                <input type="text" name="nama_layanan[]" value="{{ $item->nama_layanan }}"
+                                <input type="text" name="layanan[]" value="{{ $item->nama_layanan }}" required
                                     class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
                                 <button type="button" onclick="this.parentElement.remove()"
-                                    class="bg-birue text-white w-9 h-9 rounded-lg flex items-center justify-center transition flex-shrink-0 hover:bg-red-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                        viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
-                                    </svg>
+                                    class="bg-red-500 text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="layanan[]" placeholder="Masukkan nama layanan" required
+                                    class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
+                            </div>
+                        @endforelse
                     </div>
                     <button type="button" onclick="addLayananFieldEdit('{{ $ub->id_ub }}')"
                         class="mt-3 flex items-center gap-2 text-xs font-bold text-birua hover:text-biruc transition">
@@ -123,20 +123,19 @@
                     </button>
                 </div>
 
-                {{-- Status (Radio) --}}
+                {{-- Status --}}
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-gray-700 mb-3">Status</label>
                     <div class="flex items-center gap-8">
-                        <label class="flex items-center gap-3 cursor-pointer group">
+                        <label class="flex items-center gap-3 cursor-pointer">
                             <input type="radio" name="status" value="aktif"
-                                class="w-5 h-5 accent-[#2D3E50] cursor-pointer"
+                                class="w-5 h-5 accent-birua cursor-pointer"
                                 {{ $ub->status == 'aktif' ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-700">Aktif</span>
                         </label>
-
-                        <label class="flex items-center gap-3 cursor-pointer group">
+                        <label class="flex items-center gap-3 cursor-pointer">
                             <input type="radio" name="status" value="tidak aktif"
-                                class="w-5 h-5 accent-[#2D3E50] cursor-pointer"
+                                class="w-5 h-5 accent-birua cursor-pointer"
                                 {{ $ub->status == 'tidak aktif' ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-700">Tidak Aktif</span>
                         </label>
@@ -145,47 +144,17 @@
             </div>
 
             {{-- Tombol Aksi --}}
-            <div class="flex justify-between items-center pt-10 mt-4 p-8">
+            <div class="flex justify-between items-center p-8 border-t border-gray-50 bg-gray-50/50">
                 <button type="button"
-                    onclick="closeModal('modalEditUB_{{ $ub->id_ub }}', 'formEditUB_{{ $ub->id_ub }}')"
+                    onclick="openDiscardConfirmation('Unit Bisnis', 'modalEditUB_{{ $ub->id_ub }}', 'formEditUB_{{ $ub->id_ub }}')"
                     class="px-12 py-3 border border-birua text-birua rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                     Batal
                 </button>
                 <button type="submit"
                     class="px-12 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:opacity-90 transition shadow-lg shadow-birua/20">
-                    Update Data
+                    Simpan
                 </button>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    function previewFileEditUB(type, id) {
-        const input = document.getElementById(`input${type}Edit_${id}`);
-        const preview = document.getElementById(`preview${type}_${id}`);
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function addLayananFieldEdit(id) {
-        const container = document.getElementById(`layananContainerEdit_${id}`);
-        const div = document.createElement('div');
-        div.className = 'flex items-center gap-2 mt-2';
-        div.innerHTML = `
-            <input type="text" name="nama_layanan[]" placeholder="Masukkan Layanan Baru"
-                class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
-            <button type="button" onclick="this.parentElement.remove()"
-                class="bg-birue text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
-            </button>
-        `;
-        container.appendChild(div);
-    }
-</script>

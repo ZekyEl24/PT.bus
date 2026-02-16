@@ -100,12 +100,12 @@
 
             <nav class="mt-1 text-sm flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
                 <ul class="space-y-1">
-
                     <div class="w-3xs">
+                        {{-- MENU YANG BISA DIAKSES SEMUA ROLE (ADMIN & EDITOR UB) --}}
                         <li>
                             <a href="{{ route('dasbor.index') }}"
                                 class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'dashboard' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+               {{ $active == 'dashboard' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
                                 <div class="icon-container">
                                     <i class="fa-solid fa-home text-lg"></i>
                                 </div>
@@ -115,10 +115,11 @@
                                 </span>
                             </a>
                         </li>
+
                         <li>
                             <a href="{{ route('informasiterkini.index') }}"
                                 class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'informasi' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                   {{ $active == 'informasi' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
                                 <div class="icon-container">
                                     <i class="fa-solid fa-newspaper text-lg"></i>
                                 </div>
@@ -130,7 +131,7 @@
                         <li>
                             <a href="{{ route('ub.index') }}"
                                 class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'ub' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                   {{ $active == 'ub' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
                                 <div class="icon-container">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                         viewBox="0 0 24 24">
@@ -146,7 +147,7 @@
                         <li>
                             <a href="{{ route('banner.index') }}"
                                 class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'banner' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                   {{ $active == 'banner' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
                                 <div class="icon-container">
                                     <i class="fa-solid fa-image text-lg"></i>
                                 </div>
@@ -158,7 +159,7 @@
                         <li>
                             <a href="{{ route('profilklien.index') }}"
                                 class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'profilklien' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                   {{ $active == 'profilklien' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
                                 <div class="icon-container">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                         viewBox="0 0 448 512">
@@ -171,56 +172,60 @@
                                 </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('user.index') }}"
-                                class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'user' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
-                                <div class="icon-container">
-                                    <i class="fa-solid fa-users text-lg"></i>
-                                </div>
-                                <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
-                                    Pengguna
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('profilperusahaan.index') }}"
-                                class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'profilperusahaan' ? 'bg-kuning font-bold ' : 'hover:bg-gray-100' }}">
-                                <div class="icon-container">
-                                    <i class="fa-solid fa-building text-lg"></i>
-                                </div>
-                                <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
-                                    Profil Perusahaan
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('infokontak.index') }}"
-                                class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'infokontak' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
-                                <div class="icon-container">
-                                    <i class="fa-solid fa-address-card text-lg"></i>
-                                </div>
-                                <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
-                                    Info Kontak
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('hubungi.index') }}"
-                                class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
-                               {{ $active == 'hubungi' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
-                                <div class="icon-container">
-                                    <i class="fa-solid fa-phone text-lg"></i>
-                                </div>
-                                <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
-                                    Hubungi
-                                </span>
-                            </a>
-                        </li>
-                    </div>
 
+                        {{-- MENU KHUSUS ADMIN SAJA --}}
+                        @if (Auth::user()->role == 'admin')
+                            <li>
+                                <a href="{{ route('user.index') }}"
+                                    class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
+               {{ $active == 'user' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                                    <div class="icon-container">
+                                        <i class="fa-solid fa-users text-lg"></i>
+                                    </div>
+                                    <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
+                                        Pengguna
+                                    </span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('profilperusahaan.index') }}"
+                                    class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
+                   {{ $active == 'profilperusahaan' ? 'bg-kuning font-bold ' : 'hover:bg-gray-100' }}">
+                                    <div class="icon-container">
+                                        <i class="fa-solid fa-building text-lg"></i>
+                                    </div>
+                                    <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
+                                        Profil Perusahaan
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('infokontak.index') }}"
+                                    class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
+                   {{ $active == 'infokontak' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                                    <div class="icon-container">
+                                        <i class="fa-solid fa-address-card text-lg"></i>
+                                    </div>
+                                    <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
+                                        Info Kontak
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('hubungi.index') }}"
+                                    class="menu-link flex items-center gap-3 py-3 px-4 rounded-md transition-colors duration-200
+                   {{ $active == 'hubungi' ? 'bg-kuning font-bold' : 'hover:bg-gray-100' }}">
+                                    <div class="icon-container">
+                                        <i class="fa-solid fa-phone text-lg"></i>
+                                    </div>
+                                    <span class="menu-text overflow-hidden whitespace-nowrap opacity-100">
+                                        Hubungi
+                                    </span>
+                                </a>
+                            </li>
+                        @endif
+                    </div>
                 </ul>
             </nav>
 
@@ -261,7 +266,7 @@
                 </div>
 
                 <div class="flex flex-col items-end gap-1.5">
-                    <div class="text-black text-sm font-bold">Halo, {{ Auth::user()->username }}!</div>
+                    <div class="text-black text-xs font-bold">Halo, {{ Auth::user()->username }}!</div>
                     <div class="font-semibold text-[10px] text-white bg-birua px-5 py-1 rounded-full">
                         {{ Str::ucfirst(Auth::user()->role) }}
                     </div>
@@ -277,7 +282,8 @@
                 {{-- FOOTER --}}
                 <div class="mt-8 mb-1 flex justify-center items-center">
                     <p class="text-[11px] text-gray-800 font-medium font-poppins tracking-wide">
-                        © 2025 <span class="text-[#38A1E2] font-bold">coding</span><span class="text-[#3B3B3B] font-bold">.site</span> - Created for PT.Berkat Untuk
+                        © 2025 <span class="text-[#38A1E2] font-bold">coding</span><span
+                            class="text-[#3B3B3B] font-bold">.site</span> - Created for PT.Berkat Untuk
                         Sesama. All rights reserved.
                     </p>
                 </div>

@@ -89,7 +89,7 @@
 
                         {{-- Tombol Panggil Modal Tambah --}}
                         <button onclick="toggleModal('modalTambah')"
-                            class="bg-birua hover:bg-biruc text-white font-montserrat px-6 py-2 rounded-[10px] text-xs font-bold flex items-center gap-2 transition shadow-md">
+                            class="bg-birua hover:bg-biruc text-white font-habanera px-6 py-2 rounded-[10px] text-xs font-bold flex items-center gap-2 transition shadow-md">
                             Tambah <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
@@ -108,7 +108,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-xs">
-                                @foreach ($users as $user)
+                                @forelse ($users as $user)
                                     <tr class="hover:bg-gray-50 transition">
                                         <td
                                             class="py-5 px-6 text-center border-b border-gray-100 font-medium text-gray-700">
@@ -151,7 +151,7 @@
                                                 <button type="button"
                                                     onclick="showDeleteConfirmation('{{ route('user.destroy', $user->id) }}')"
                                                     class="w-8 h-8 rounded-full bg-birud text-white flex items-center justify-center hover:bg-red-900 transition shadow-sm">
-                                                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                         viewBox="0 0 24 24">
                                                         <path fill="currentColor"
                                                             d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -173,7 +173,30 @@
                                         </div>
                                     </div>
                                     {{-- ========================================================== --}}
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="py-18 text-center bg-white">
+                                            <div class="flex flex-col items-center">
+                                                {{-- Ikon --}}
+                                                <div class="mb-4 text-gray-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1"
+                                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                </div>
+                                                {{-- Teks --}}
+                                                <h3 class="text-gray-700 font-habanera font-bold text-base">Hasil Tidak
+                                                    Ditemukan</h3>
+                                                <p class="text-gray-500 font-habanera text-xs max-w-xs mx-auto mt-1">
+                                                    Maaf, kami tidak menemukan data yang sesuai dengan kriteria atau kata
+                                                    kunci Anda.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -390,6 +413,7 @@
                     newConfirmButton.onclick = function() {
                         // TUTUP modal konfirmasi
                         closeModal('deleteConfirmationModal');
+                        newConfirmButton.disabled = true;
 
                         // Submit form DELETE
                         deleteForm.submit();

@@ -41,11 +41,6 @@ class UsersController extends Controller
         ]);
     }
 
-    // SHOW (Menampilkan satu user)
-    public function show(User $user)
-    {
-        // return view('admin.user.show', compact('user'));
-    }
 
     // 1. EDIT (Menampilkan form edit dengan data terisi)
     public function edit(User $user)

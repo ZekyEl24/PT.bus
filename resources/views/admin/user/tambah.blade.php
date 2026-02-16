@@ -6,7 +6,7 @@
         class="bg-white rounded-[15px] shadow-2xl w-full max-w-[600px] transform transition-all scale-95 opacity-0 duration-300 max-h-full overflow-y-auto">
 
         {{-- Judul Modal --}}
-        <div class="py-6 border-b border-gray-200 text-center">
+        <div class="py-6 border-b border-gray-100 text-center sticky top-0 bg-white z-10">
             <h3 class="text-lg font-bold text-gray-800">Tambah Pengguna</h3>
         </div>
 

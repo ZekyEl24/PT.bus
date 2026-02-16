@@ -7,7 +7,7 @@
         class="bg-white rounded-[15px] shadow-2xl w-full max-w-[800px] transform transition-all scale-95 opacity-0 duration-300 max-h-[90vh] overflow-y-auto">
 
         {{-- Judul Modal --}}
-        <div class="py-6 border-b border-gray-100 text-center relative">
+        <div class="py-6 border-b border-gray-100 text-center sticky top-0 bg-white z-10">
             <h3 class="text-lg font-bold text-gray-800">Tambah Banner</h3>
             {{-- Sesuaikan fungsi closeModal --}}
             <button type="button" onclick="closeModal('modalTambahBanner', 'formTambahBanner')"
@@ -76,7 +76,7 @@
                                 <div id="placeholderTambah" class="flex flex-col items-center">
                                     <i class="fa-solid fa-image text-4xl text-gray-300"></i>
                                     <span class="text-[10px] text-gray-400 mt-2 font-medium italic">*Klik untuk pilih
-                                        foto</span>
+                                        gambar</span>
                                 </div>
                                 <img id="previewImageTambah" src="#" alt="Preview"
                                     class="hidden max-w-[90%] max-h-[90%] object-contain transition-transform">
@@ -96,7 +96,7 @@
             <div class="flex justify-between items-center pt-10">
                 {{-- Tombol Batal di Kiri --}}
                 <button type="button" onclick="closeModal('modalTambahBanner', 'formTambahBanner')"
-                    class="px-10 py-3 border border-gray-300 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
+                    class="px-10 py-3 border border-birua text-birua rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                     Batal
                 </button>
 

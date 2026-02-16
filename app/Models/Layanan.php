@@ -15,6 +15,6 @@ class Layanan extends Model
      */
     public function unitBisnis()
     {
-        return $this->belongsTo(UnitBisnis::class, 'id_ub', 'id_');
+        return $this->belongsTo(UnitBisnis::class, 'id_ub', 'id_ub');
     }
 }

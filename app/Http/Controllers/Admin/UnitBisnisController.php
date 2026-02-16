@@ -51,44 +51,46 @@ class UnitBisnisController extends Controller
             'link_web_ub' => 'required|url',
             'link_ig_ub' => 'required|url',
             'status' => 'required|in:aktif,tidak aktif',
-            'layanan' => 'nullable|array', // Validasi array layanan
+            'layanan' => 'required|nullable|array', // Validasi array layanan
         ]);
 
-        $data = $request->except('layanan'); // Ambil semua kecuali input layanan
+        try {
+            $data = $request->except('layanan');
+            $data['id_pengguna'] = Auth::id();
 
-        // Catat siapa yang membuat
-        $data['id_pengguna'] = Auth::id();
+            if ($request->file('logo_ub')) {
+                $data['logo_ub'] = $request->file('logo_ub')->store('assets/foto/UB/Logo', 'public');
+            }
 
-        // Upload Logo
-        if ($request->file('logo_ub')) {
-            $data['logo_ub'] = $request->file('logo_ub')->store('assets/foto/UB/Logo', 'public');
-        }
+            if ($request->file('gambar_ub')) {
+                $data['gambar_ub'] = $request->file('gambar_ub')->store('assets/foto/UB/fotoub', 'public');
+            }
 
-        // Upload Gambar Utama
-        if ($request->file('gambar_ub')) {
-            $data['gambar_ub'] = $request->file('gambar_ub')->store('assets/foto/UB/fotoub', 'public');
-        }
+            $ub = UnitBisnis::create($data);
 
-        // 1. Simpan Unit Bisnis ke DB
-        $ub = UnitBisnis::create($data);
-
-        // 2. Simpan Layanan ke DB (Jika ada layanan yang ditambahkan)
-        if ($request->has('layanan') && is_array($request->layanan)) {
-            foreach ($request->layanan as $item) {
-                if (!empty($item)) {
-                    Layanan::create([
-                        'id_ub' => $ub->id_ub, // Ambil ID dari UB yang baru saja dibuat
-                        'nama_layanan' => $item
-                    ]);
+            if ($request->has('layanan') && is_array($request->layanan)) {
+                foreach ($request->layanan as $item) {
+                    if (!empty($item)) {
+                        Layanan::create([
+                            'id_ub' => $ub->id_ub,
+                            'nama_layanan' => $item
+                        ]);
+                    }
                 }
             }
-        }
 
-        return redirect()->route('ub.index')->with('success', 'Unit Bisnis dan Layanan berhasil ditambahkan!');
+            return redirect()->route('ub.index')->with('success_type', 'buat');
+        } catch (\Exception $e) {
+            // Jika gagal, hapus foto yang sudah terlanjur terupload (Opsional tapi disarankan)
+            if (isset($data['logo_ub'])) Storage::disk('public')->delete($data['logo_ub']);
+            if (isset($data['gambar_ub'])) Storage::disk('public')->delete($data['gambar_ub']);
+
+            return redirect()->back()->with('error_type', 'gagal')->withInput();
+        }
     }
-    /**
-     * Update data UB
-     */
+
+
+
     public function update(Request $request, $id)
     {
         $ub = UnitBisnis::findOrFail($id);
@@ -100,46 +102,44 @@ class UnitBisnisController extends Controller
             'gambar_ub' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'link_web_ub' => 'required|url',
             'link_ig_ub' => 'required|url',
-            'status' => 'required|in:aktif,tidak aktif', // Sesuaikan dengan value radio button di HTML
-            'nama_layanan' => 'nullable|array',
+            'status' => 'required|in:aktif,tidak aktif',
+            'layanan' => 'required|nullable|array',
         ]);
 
-        $data = $request->except('nama_layanan'); // Ambil semua data kecuali array layanan
+        try {
+            $data = $request->except('layanan');
+            $data['id_pengguna'] = Auth::id();
 
-        // Update pencatat: siapa yang terakhir mengubah data
-        $data['id_pengguna'] = Auth::id();
+            // Logo
+            if ($request->hasFile('logo_ub')) {
+                if ($ub->logo_ub) Storage::disk('public')->delete($ub->logo_ub);
+                $data['logo_ub'] = $request->file('logo_ub')->store('assets/foto/UB/Logo', 'public');
+            }
 
-        // Handle ganti Logo
-        if ($request->hasFile('logo_ub')) {
-            if ($ub->logo_ub) Storage::disk('public')->delete($ub->logo_ub);
-            $data['logo_ub'] = $request->file('logo_ub')->store('assets/foto/UB/Logo', 'public');
-        }
+            // Gambar Utama
+            if ($request->hasFile('gambar_ub')) {
+                if ($ub->gambar_ub) Storage::disk('public')->delete($ub->gambar_ub);
+                $data['gambar_ub'] = $request->file('gambar_ub')->store('assets/foto/UB/fotoub', 'public');
+            }
 
-        // Handle ganti Gambar Utama
-        if ($request->hasFile('gambar_ub')) {
-            if ($ub->gambar_ub) Storage::disk('public')->delete($ub->gambar_ub);
-            $data['gambar_ub'] = $request->file('gambar_ub')->store('assets/foto/UB/fotoub', 'public');
-        }
+            $ub->update($data);
 
-        // 1. Update data Unit Bisnis
-        $ub->update($data);
+            if ($request->has('layanan')) {
+                $ub->layanan()->delete();
 
-        // 2. Update data Layanan (Hapus yang lama, simpan yang baru)
-        // Ini cara paling efisien untuk sinkronisasi input dinamis
-        $ub->layanan()->delete();
-
-        if ($request->has('nama_layanan') && is_array($request->nama_layanan)) {
-            foreach ($request->nama_layanan as $item) {
-                if (!empty($item)) {
-                    Layanan::create([
-                        'id_ub' => $ub->id_ub,
-                        'nama_layanan' => $item
-                    ]);
+                foreach ($request->layanan as $item) {
+                    if (!empty($item)) {
+                        $ub->layanan()->create([
+                            'nama_layanan' => $item
+                        ]);
+                    }
                 }
             }
-        }
 
-        return redirect()->route('ub.index')->with('success', 'Data Unit Bisnis dan Layanan berhasil diperbarui.');
+            return redirect()->route('ub.index')->with('success_type', 'simpan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error_type', 'gagal')->withInput();
+        }
     }
 
     /**
@@ -147,14 +147,17 @@ class UnitBisnisController extends Controller
      */
     public function destroy($id)
     {
-        $ub = UnitBisnis::findOrFail($id);
+        try {
+            $ub = UnitBisnis::findOrFail($id);
 
-        // Hapus file fisik agar storage tidak penuh
-        if ($ub->logo_ub) Storage::disk('public')->delete($ub->logo_ub);
-        if ($ub->gambar_ub) Storage::disk('public')->delete($ub->gambar_ub);
+            if ($ub->logo_ub) Storage::disk('public')->delete($ub->logo_ub);
+            if ($ub->gambar_ub) Storage::disk('public')->delete($ub->gambar_ub);
 
-        $ub->delete();
+            $ub->delete();
 
-        return redirect()->route('ub.index')->with('success', 'Unit Bisnis berhasil dihapus.');
+            return redirect()->route('ub.index')->with('success_type', 'hapus');
+        } catch (\Exception $e) {
+            return redirect()->route('ub.index')->with('error_type', 'hapus');
+        }
     }
 }

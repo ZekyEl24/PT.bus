@@ -13,7 +13,7 @@
     @extends('layout.admin')
 
     @section('content')
-        <div class="h-full font-habanera">
+        <div class="h-full">
             <div
                 class="bg-gradient-to-t from-kuning via-kuningterang to-white p-6 rounded-[10px] shadow-lg min-h-[85vh] relative flex flex-col">
 
@@ -100,7 +100,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-xs">
-                                @foreach ($banners as $banner)
+                                @forelse ($banners as $banner)
                                     <tr class="hover:bg-gray-50 transition text-center">
                                         <td class="py-3 px-6 border-b border-gray-100">
                                             <img src="{{ asset('storage/' . $banner->gambar) }}"
@@ -125,7 +125,7 @@
                                         <td class="py-3 px-6 border-b border-gray-100">
                                             <div class="flex justify-center gap-2">
                                                 <button onclick="toggleModal('modalEditBanner_{{ $banner->id }}')"
-                                                    class="w-8 h-8 rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 shadow-sm transition">
+                                                    class="w-[30px] h-[30px] rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 transition shadow-sm">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
                                                         viewBox="0 0 24 24">
                                                         <path fill="currentColor"
@@ -146,71 +146,96 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    @include('admin.banner.edit')
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    @include('admin.banner.edit', ['banner' => $banner])
                     </div>
+                @empty
+                    <tr>
+                        <td colspan="9" class="py-18 text-center bg-white">
+                            <div class="flex flex-col items-center">
+                                {{-- Ikon --}}
+                                <div class="mb-4 text-gray-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                {{-- Teks --}}
+                                <h3 class="text-gray-700 font-habanera font-bold text-base">Hasil Tidak
+                                    Ditemukan</h3>
+                                <p class="text-gray-500 font-habanera text-xs max-w-xs mx-auto mt-1">
+                                    Maaf, kami tidak menemukan data yang sesuai dengan kriteria atau kata
+                                    kunci Anda.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                    </tbody>
+                    </table>
+                </div>
 
+                {{-- Pagination --}}
+                <div class="mt-auto py-6 flex justify-center">
                     {{-- Pagination --}}
-                    <div class="mt-auto py-6 flex justify-center">
-                        {{-- Pagination --}}
-                        <div class="mt-auto py-8 flex justify-center items-center gap-2">
-                            {{-- Tombol Previous --}}
-                            @if ($banners->onFirstPage())
-                                <span class="p-2 text-gray-300 cursor-not-allowed">
-                                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                    <div class="mt-auto py-8 flex justify-center items-center gap-2">
+                        {{-- Tombol Previous --}}
+                        @if ($banners->onFirstPage())
+                            <span class="p-2 text-gray-300 cursor-not-allowed">
+                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                            </span>
+                        @else
+                            <a href="{{ $banners->previousPageUrl() }}"
+                                class="p-2 text-gray-500 hover:text-black transition">
+                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                            </a>
+                        @endif
+
+                        {{-- Angka Halaman --}}
+                        @foreach ($banners->getUrlRange(1, $banners->lastPage()) as $page => $url)
+                            @if ($page == $banners->currentPage())
+                                <span
+                                    class="w-7 h-7 flex items-center justify-center rounded bg-kuning text-black font-bold text-xs shadow-sm">
+                                    {{ $page }}
                                 </span>
                             @else
-                                <a href="{{ $banners->previousPageUrl() }}"
-                                    class="p-2 text-gray-500 hover:text-black transition">
-                                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                                <a href="{{ $url }}"
+                                    class="w-7 h-7 flex items-center justify-center rounded text-gray-500 hover:bg-gray-100 text-xs font-bold transition">
+                                    {{ $page }}
                                 </a>
                             @endif
+                        @endforeach
 
-                            {{-- Angka Halaman --}}
-                            @foreach ($banners->getUrlRange(1, $banners->lastPage()) as $page => $url)
-                                @if ($page == $banners->currentPage())
-                                    <span
-                                        class="w-7 h-7 flex items-center justify-center rounded bg-kuning text-black font-bold text-xs shadow-sm">
-                                        {{ $page }}
-                                    </span>
-                                @else
-                                    <a href="{{ $url }}"
-                                        class="w-7 h-7 flex items-center justify-center rounded text-gray-500 hover:bg-gray-100 text-xs font-bold transition">
-                                        {{ $page }}
-                                    </a>
-                                @endif
-                            @endforeach
-
-                            {{-- Tombol Next --}}
-                            @if ($banners->hasMorePages())
-                                <a href="{{ $banners->nextPageUrl() }}"
-                                    class="p-2 text-gray-500 hover:text-black transition">
-                                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                                </a>
-                            @else
-                                <span class="p-2 text-gray-300 cursor-not-allowed">
-                                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                                </span>
-                            @endif
-                        </div>
+                        {{-- Tombol Next --}}
+                        @if ($banners->hasMorePages())
+                            <a href="{{ $banners->nextPageUrl() }}"
+                                class="p-2 text-gray-500 hover:text-black transition">
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </a>
+                        @else
+                            <span class="p-2 text-gray-300 cursor-not-allowed">
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
+        </div>
 
         @include('layout.partials.delete_confirmation_modal')
         @include('layout.partials.success_notification')
+        @include('layout.partials.edit_confirmation')
         @include('admin.banner.tambah')
 
 
         <script>
             // MODAL CORE FUNCTIONS
             function getModalContentId(modalId) {
-                if (modalId.startsWith('modalEditBanner_')) return `modalContentEditBanner_${modalId.split('_')[1]}`;
+                if (modalId.includes('modalEditBanner_')) return `modalContentEditBanner_${modalId.split('_')[1]}`;
                 if (modalId === 'modalTambahBanner') return 'modalContentTambahBanner';
                 if (modalId === 'deleteConfirmationModal') return 'deleteConfirmationModalContent';
+                if (modalId === 'editConfirmation') return 'editConfirmationContent';
                 return null;
             }
 
@@ -308,9 +333,73 @@
                     closeModal('deleteConfirmationModal');
 
                     newConfirmButton.disabled = true;
-                    newConfirmButton.innerText = "Memproses...";
-
                     deleteForm.submit();
+                }
+            }
+
+            // Fungsi untuk memicu Modal Konfirmasi Pembatalan Edit
+            function openDiscardConfirmation(contextText, modalToCloseId, formId) {
+                const discardModalId = 'editConfirmation'; // Menggunakan ID yang Anda tentukan
+                const confirmButtonId = 'confirmEditButton'; // ID tombol "Ya" dari modal yang Anda berikan
+
+                const contextSpan = document.getElementById('discardContextText'); // Asumsi ada elemen ini di partial view
+                const confirmButton = document.getElementById(confirmButtonId);
+
+                // 1. Menyimpan state modal dan form yang sedang aktif
+                lastActiveModalId = modalToCloseId;
+                formToResetId = formId;
+
+                // 2. Mengatur teks dinamis pada modal konfirmasi
+                if (contextSpan) {
+                    contextSpan.textContent = contextText;
+                }
+
+                // 3. Menampilkan modal konfirmasi pembatalan
+                const discardContentId = getModalContentId(discardModalId);
+                const modal = document.getElementById(discardModalId);
+                const content = document.getElementById(discardContentId);
+
+                if (modal && content) {
+                    modal.classList.replace('hidden', 'flex');
+                    setTimeout(() => {
+                        content.classList.replace('scale-95', 'scale-100');
+                        content.classList.replace('opacity-0', 'opacity-100');
+                    }, 10);
+                }
+
+                // 4. MENGHAPUS & Mengatur ulang fungsi tombol 'Ya' (confirmEditButton)
+                const newConfirmButton = confirmButton.cloneNode(true);
+                confirmButton.replaceWith(newConfirmButton);
+
+                newConfirmButton.onclick = function() {
+                    // A. Menutup modal konfirmasi pembatalan
+                    closeModal(discardModalId);
+
+                    if (lastActiveModalId && formToResetId) {
+                        // B. Menutup modal edit dan mereset form yang ditargetkan
+                        closeModal(lastActiveModalId, formToResetId, true);
+                    }
+
+                    // C. Membersihkan state
+                    lastActiveModalId = null;
+                    formToResetId = null;
+                };
+
+                // 5. Mengatur Tombol 'Tidak' (Tombol Batal, biasanya tombol merah/kiri)
+                // Tombol ini harus membuka kembali modal edit yang sedang aktif
+                const noButton = document.querySelector(`#${discardModalId} button.bg-red-600`);
+                if (noButton) {
+                    // Clone dan replace untuk menghindari event listener duplikat
+                    const newNoButton = noButton.cloneNode(true);
+                    noButton.replaceWith(newNoButton);
+
+                    newNoButton.onclick = function() {
+                        closeModal(discardModalId);
+                        if (lastActiveModalId) {
+                            // Membuka kembali modal edit yang sedang aktif
+                            toggleModal(lastActiveModalId);
+                        }
+                    };
                 }
             }
 
@@ -333,6 +422,105 @@
                 const val = searchInput.value;
                 searchInput.value = '';
                 searchInput.value = val;
+            }
+
+            //fungsi untuk mengecek perubahan pada form edit banner
+            // Global state untuk menyimpan data asli Banner
+            let initialBannerData = {};
+
+            // 1. Modifikasi fungsi toggleModal agar merekam data saat modal edit banner dibuka
+            const originalToggleModalBanner = toggleModal;
+            toggleModal = function(id) {
+                originalToggleModalBanner(id);
+
+                if (id.startsWith('modalEditBanner_')) {
+                    const bannerId = id.split('_')[1];
+                    setTimeout(() => {
+                        trackInitialBannerData(bannerId);
+                    }, 100);
+                }
+            };
+
+            // 2. Fungsi merekam data asli
+            function trackInitialBannerData(id) {
+                const form = document.getElementById('formEditBanner_' + id);
+                if (!form) return;
+
+                const formData = new FormData(form);
+                initialBannerData[id] = {};
+
+                formData.forEach((value, key) => {
+                    if (!(value instanceof File)) {
+                        initialBannerData[id][key] = value;
+                    }
+                });
+            }
+
+            // 3. Fungsi Cek Perubahan Banner
+            function checkChangesBanner(id) {
+                const form = document.getElementById('formEditBanner_' + id);
+                const btnSimpan = document.getElementById('btnSimpanBanner_' + id);
+                if (!form || !btnSimpan) return false;
+
+                const currentData = new FormData(form);
+                let hasChanged = false;
+
+                currentData.forEach((value, key) => {
+                    // Abaikan field internal laravel dan ID
+                    if (key === '_token' || key === '_method' || key === 'banner_id_for_edit') return;
+
+                    if (!(value instanceof File)) {
+                        if (value !== initialBannerData[id][key]) {
+                            hasChanged = true;
+                        }
+                    } else {
+                        if (value.size > 0) {
+                            hasChanged = true;
+                        }
+                    }
+                });
+
+                // Update UI Tombol Simpan
+                if (hasChanged) {
+                    btnSimpan.disabled = false;
+                    btnSimpan.className =
+                        "px-10 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:bg-biruc transition shadow-lg cursor-pointer";
+                } else {
+                    btnSimpan.disabled = true;
+                    btnSimpan.className =
+                        "px-10 py-3 bg-gray-400 text-white rounded-xl text-xs font-bold transition cursor-not-allowed";
+                }
+
+                return hasChanged;
+            }
+
+            // 4. Fungsi Batal Banner
+            function handleCancelEditBanner(id) {
+                const modalId = 'modalEditBanner_' + id;
+                const formId = 'formEditBanner_' + id;
+
+                if (checkChangesBanner(id)) {
+                    openDiscardConfirmation('Banner', modalId, formId);
+                } else {
+                    closeModal(modalId, formId);
+                }
+            }
+
+            // 5. Update fungsi preview file khusus banner
+            function previewFileBanner(id) {
+                const file = document.getElementById('inputGambarEdit_' + id).files[0];
+                const preview = document.getElementById('previewImageEdit_' + id);
+                const reader = new FileReader();
+
+                reader.onloadend = function() {
+                    preview.src = reader.result;
+                    // Panggil pengecekan setelah gambar dipilih
+                    checkChangesBanner(id);
+                }
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
             }
         </script>
     @endsection
