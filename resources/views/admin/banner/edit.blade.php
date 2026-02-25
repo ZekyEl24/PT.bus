@@ -106,7 +106,7 @@
                 <div class="flex justify-between gap-4 pt-10">
                     <button type="button"
                         onclick="handleCancelEditBanner('{{ $banner->id }}')"
-                        class="px-10 py-3 border border-gray-300 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
+                        class="px-12 py-3 border border-birua text-birua rounded-xl text-xs font-bold hover:bg-gray-50 transition">
                         Batal
                     </button>
 

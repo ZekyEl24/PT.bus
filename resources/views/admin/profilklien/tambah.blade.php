@@ -78,7 +78,7 @@
                     Batal
                 </button>
                 <button type="submit"
-                    class="px-12 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:opacity-90 transition shadow-lg shadow-birua/20">
+                    class="px-12 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:opacity-90 transition">
                     Simpan
                 </button>
             </div>

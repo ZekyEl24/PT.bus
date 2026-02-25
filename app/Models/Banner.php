@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model {
+    protected $primaryKey = 'id';
     protected $fillable = ['judul', 'gambar', 'kategori', 'status'];
 }

@@ -110,7 +110,7 @@
                                         </td>
 
                                         {{-- Nama --}}
-                                        <td class="py-3 px-16 border-b border-gray-100 font-light text-gray-700">
+                                        <td class="py-4 px-12 border-b border-gray-100 font-light text-gray-700">
                                             <p class="w-32">{{ $ub->nama_ub }}</p>
                                         </td>
 
@@ -285,40 +285,211 @@
 
 
         <script>
-            function openLayananModal(namaUb, layananData) {
-                const modal = document.getElementById('modalLayanan');
-                const content = document.getElementById('modalContentLayanan');
-                const listContainer = document.getElementById('listLayanan');
-
-                // Bersihkan isi modal sebelumnya
-                listContainer.innerHTML = '';
-
-                // Pastikan data adalah array
-                let layananArray = Array.isArray(layananData) ? layananData : [];
-
-                if (layananArray.length > 0) {
-                    layananArray.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className =
-                            "w-full p-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium text-xs text-center";
-
-                        div.textContent = `${item.nama_layanan}`;
-
-                        listContainer.appendChild(div);
-                    });
-                } else {
-                    listContainer.innerHTML =
-                        '<p class="text-center text-gray-400 py-4 italic">Belum ada layanan untuk unit ini.</p>';
-                }
-
-                // Tampilkan Modal
-                modal.classList.replace('hidden', 'flex');
-                setTimeout(() => {
-                    content.classList.replace('scale-95', 'scale-100');
-                    content.classList.replace('opacity-0', 'opacity-100');
-                }, 10);
+            // Fungsi untuk memperbarui filter status dan submit form
+            function updateStatus(status) {
+                document.getElementById('statusInput').value = status;
+                document.getElementById('filterForm').submit();
             }
 
+            // Fungsi untuk pencarian otomatis dengan delay (debounce) agar tidak memberatkan server
+            let searchTimer;
+
+            function autoSearch() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 800); // Submit otomatis setelah 0.8 detik berhenti mengetik
+            }
+
+            // Toggle Dropdown Filter Status
+            const filterBtn = document.getElementById('filterBtn');
+            const filterDropdown = document.getElementById('filterDropdown');
+
+            if (filterBtn) {
+                filterBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    filterDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Tutup dropdown jika klik di luar area
+            window.addEventListener('click', function(e) {
+                if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                    filterDropdown.classList.add('hidden');
+                }
+            });
+
+
+
+
+            // State global untuk menyimpan data awal Unit Bisnis
+            let initialUBData = {};
+            let lastActiveModalId = null;
+            let formToResetId = null;
+
+            // ==========================================
+            // 1. CORE MODAL LOGIC (MODIFIED)
+            // ==========================================
+
+            function getModalContentId(modalId) {
+                if (modalId.startsWith('modalEditUB_')) {
+                    return `modalContentEditUB_${modalId.split('_')[1]}`;
+                }
+                if (modalId === 'modalTambahUB') return 'modalContentTambahUB';
+                if (modalId === 'deleteConfirmationModal') return 'deleteConfirmationModalContent';
+                if (modalId === 'editConfirmation') return 'editConfirmationContent';
+                if (modalId === 'modalLayanan') return 'modalContentLayanan';
+                return null;
+            }
+
+            function toggleModal(modalId) {
+                const modal = document.getElementById(modalId);
+                const contentId = getModalContentId(modalId);
+                const content = document.getElementById(contentId);
+
+                if (modal && modal.classList.contains('hidden')) {
+                    modal.classList.replace('hidden', 'flex');
+
+                    // KHUSUS EDIT: Rekam data awal saat modal dibuka
+                    if (modalId.startsWith('modalEditUB_')) {
+                        const id = modalId.split('_')[1];
+                        setTimeout(() => trackInitialUBData(id), 100);
+                    }
+
+                    setTimeout(() => {
+                        content.classList.replace('scale-95', 'scale-100');
+                        content.classList.replace('opacity-0', 'opacity-100');
+                    }, 10);
+                }
+            }
+
+            function closeModal(modalId, formId = null, isDiscarded = false) {
+                const modal = document.getElementById(modalId);
+                const contentId = getModalContentId(modalId);
+                const content = document.getElementById(contentId);
+
+                if (!content) return;
+
+                content.classList.replace('scale-100', 'scale-95');
+                content.classList.replace('opacity-100', 'opacity-0');
+
+                setTimeout(() => {
+                    modal.classList.replace('flex', 'hidden');
+                    // Reset form jika diperintahkan
+                    if (formId) {
+                        const form = document.getElementById(formId);
+                        if (form) form.reset();
+
+                        // Jika modal edit ditutup, bersihkan state tombol simpan
+                        if (modalId.startsWith('modalEditUB_')) {
+                            const id = modalId.split('_')[1];
+                            const btn = document.getElementById(`btnSimpanEdit_${id}`);
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.className =
+                                    "px-12 py-3 bg-gray-400 text-white rounded-xl text-xs font-bold transition cursor-not-allowed";
+                            }
+                        }
+                    }
+                }, 300);
+            }
+
+            // ==========================================
+            // 2. UNIT BISNIS EDIT LOGIC (NEW)
+            // ==========================================
+
+            // Rekam data awal (digunakan untuk perbandingan)
+            function trackInitialUBData(id) {
+                const form = document.getElementById('formEditUB_' + id);
+                if (!form) return;
+
+                const formData = new FormData(form);
+                initialUBData[id] = {};
+
+                formData.forEach((value, key) => {
+                    if (!(value instanceof File)) {
+                        if (key === 'layanan[]') {
+                            if (!initialUBData[id][key]) initialUBData[id][key] = [];
+                            initialUBData[id][key].push(value);
+                        } else {
+                            initialUBData[id][key] = value;
+                        }
+                    }
+                });
+            }
+
+            // Cek setiap ada input apakah berbeda dengan data awal
+            function checkChangesUB(id) {
+                const form = document.getElementById('formEditUB_' + id);
+                const btnSimpan = document.getElementById('btnSimpanEdit_' + id);
+                if (!form || !btnSimpan) return false;
+
+                const currentFormData = new FormData(form);
+                let hasChanged = false;
+
+                // 1. Cek Layanan (Array)
+                let currentLayanan = [];
+                currentFormData.forEach((value, key) => {
+                    if (key === 'layanan[]') currentLayanan.push(value);
+                });
+                const initialLayanan = initialUBData[id]['layanan[]'] || [];
+                if (JSON.stringify(currentLayanan) !== JSON.stringify(initialLayanan)) {
+                    hasChanged = true;
+                }
+
+                // 2. Cek Field Lainnya & File
+                if (!hasChanged) {
+                    for (let [key, value] of currentFormData.entries()) {
+                        if (key === '_token' || key === '_method' || key === 'layanan[]') continue;
+
+                        if (!(value instanceof File)) {
+                            if (value !== initialUBData[id][key]) {
+                                hasChanged = true;
+                                break;
+                            }
+                        } else {
+                            if (value.size > 0) { // Ada file baru dipilih
+                                hasChanged = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Update UI Tombol
+                if (hasChanged) {
+                    btnSimpan.disabled = false;
+                    btnSimpan.className =
+                        "px-12 py-3 bg-birua text-white rounded-xl text-xs font-bold hover:bg-biruc transition shadow-lg cursor-pointer";
+                } else {
+                    btnSimpan.disabled = true;
+                    btnSimpan.className =
+                        "px-12 py-3 bg-gray-400 text-white rounded-xl text-xs font-bold transition cursor-not-allowed";
+                }
+
+                return hasChanged;
+            }
+
+            // Fungsi Tambah Field Layanan di Modal Edit
+            function addLayananFieldEdit(id) {
+                const container = document.getElementById(`layananContainerEdit_${id}`);
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 mt-2';
+                div.innerHTML = `
+            <input type="text" name="layanan[]" required oninput="checkChangesUB('${id}')"
+                class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
+            <button type="button" onclick="this.parentElement.remove(); checkChangesUB('${id}')"
+                class="bg-birub text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-birue transition flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+            </button>
+        `;
+                container.appendChild(div);
+                checkChangesUB(id);
+            }
+
+            //fungsi tutup layanan
             function closeLayananModal() {
                 const modal = document.getElementById('modalLayanan');
                 const content = document.getElementById('modalContentLayanan');
@@ -330,195 +501,149 @@
                 }, 300);
             }
 
-            function getModalContentId(modalId) {
-                // Jika modalId adalah "modalEditUB_12", maka split akan menghasilkan ["modalEditUB", "12"]
-                if (modalId.startsWith('modalEditUB_')) {
-                    return `modalContentEditUB_${modalId.split('_')[1]}`;
-                }
-                if (modalId === 'modalTambahUB') return 'modalContentTambahUB';
-                if (modalId === 'deleteConfirmationModal') return 'deleteConfirmationModalContent';
-                // ID konten untuk modal konfirmasi pembatalan (editConfirmation)
-                if (modalId === 'editConfirmation') return 'editConfirmationContent';
-                if (modalId === 'modalLayanan') return 'modalContentLayanan'; // Tambahkan ini
-                return null;
-            }
-
-            function toggleModal(modalId) {
-                const modal = document.getElementById(modalId);
-                const contentId = getModalContentId(modalId);
-                const content = document.getElementById(contentId);
-                if (modal && modal.classList.contains('hidden')) {
-                    modal.classList.replace('hidden', 'flex');
-                    setTimeout(() => {
-                        content.classList.replace('scale-95', 'scale-100');
-                        content.classList.replace('opacity-0', 'opacity-100');
-                    }, 10);
+            // Preview Gambar & Trigger Check
+            function previewFileEditUB(type, id) {
+                const file = document.getElementById(`input${type}Edit_${id}`).files[0];
+                const preview = document.getElementById(`preview${type}_${id}`);
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        preview.src = reader.result;
+                        checkChangesUB(id);
+                    }
+                    reader.readAsDataURL(file);
                 }
             }
 
-            function closeModal(modalId, formId = null) {
-                const modal = document.getElementById(modalId);
-                const contentId = getModalContentId(modalId);
-                const content = document.getElementById(contentId);
-                if (!content) return;
-                content.classList.replace('scale-100', 'scale-95');
-                content.classList.replace('opacity-100', 'opacity-0');
-                if (formId) document.getElementById(formId).reset();
-                setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
+            // ==========================================
+            // 3. CONFIRMATION & CANCEL LOGIC
+            // ==========================================
+
+            function openDiscardConfirmation(contextText, modalToCloseId, formId) {
+                const id = modalToCloseId.split('_')[1];
+
+                // Hanya tampilkan konfirmasi jika benar-benar ada perubahan
+                if (!checkChangesUB(id)) {
+                    closeModal(modalToCloseId, formId);
+                    return;
+                }
+
+                const discardModalId = 'editConfirmation';
+                const confirmButton = document.getElementById('confirmEditButton');
+                const contextSpan = document.getElementById('discardContextText');
+
+                lastActiveModalId = modalToCloseId;
+                formToResetId = formId;
+
+                if (contextSpan) contextSpan.textContent = contextText;
+
+                // Buka Modal Konfirmasi
+                toggleModal(discardModalId);
+
+                // Reset Event Handler Tombol "Ya"
+                const newConfirmButton = confirmButton.cloneNode(true);
+                confirmButton.replaceWith(newConfirmButton);
+
+                newConfirmButton.onclick = function() {
+                    closeModal(discardModalId);
+                    if (lastActiveModalId && formToResetId) {
+                        closeModal(lastActiveModalId, formToResetId, true);
+                    }
+                    lastActiveModalId = null;
+                    formToResetId = null;
+                };
+            }
+
+            // ==========================================
+            // 4. OTHER UTILITIES (SEARCH, DELETE, LAYANAN VIEW)
+            // ==========================================
+
+            function openLayananModal(namaUb, layananData) {
+                const modal = document.getElementById('modalLayanan');
+                const listContainer = document.getElementById('listLayanan');
+                listContainer.innerHTML = '';
+
+                let layananArray = Array.isArray(layananData) ? layananData : [];
+                if (layananArray.length > 0) {
+                    layananArray.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className =
+                            "w-full p-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium text-xs text-center";
+                        div.textContent = item.nama_layanan;
+                        listContainer.appendChild(div);
+                    });
+                } else {
+                    listContainer.innerHTML = '<p class="text-center text-gray-400 py-4 italic">Belum ada layanan.</p>';
+                }
+                toggleModal('modalLayanan');
             }
 
             let typingTimer;
 
             function autoSearch() {
                 clearTimeout(typingTimer);
-                typingTimer = setTimeout(function() {
+                typingTimer = setTimeout(() => {
                     document.getElementById('filterForm').submit();
                 }, 500);
             }
 
             function showDeleteConfirmation(deleteUrl) {
-                const modal = document.getElementById('deleteConfirmationModal');
-                const content = document.getElementById('deleteConfirmationModalContent');
                 const deleteForm = document.getElementById('deleteForm');
-                const confirmBtn = document.getElementById('confirmDeleteButton'); // Ambil tombol Ya
-
-                if (modal && content) {
-                    modal.classList.replace('hidden', 'flex');
-                    setTimeout(() => {
-                        content.classList.replace('scale-95', 'scale-100');
-                        content.classList.replace('opacity-0', 'opacity-100');
-                    }, 10);
-                }
-
-                // Set action URL ke form
+                const confirmBtn = document.getElementById('confirmDeleteButton');
+                toggleModal('deleteConfirmationModal');
                 deleteForm.setAttribute('action', deleteUrl);
-
-                // Tambahkan event klik pada tombol 'Ya' untuk submit form
-                confirmBtn.onclick = function() {
-                    deleteForm.submit();
-                };
+                confirmBtn.onclick = () => deleteForm.submit();
             }
 
-            window.onclick = (e) => {
-                if (e.target.id.startsWith('modal')) closeModal(e.target.id);
-            };
-
-            // Tambahkan fungsi ini di dalam script
             function updateStatus(val) {
                 document.getElementById('statusInput').value = val;
                 document.getElementById('filterForm').submit();
             }
 
-            // Logic untuk membuka/tutup dropdown status
-            const filterBtn = document.getElementById('filterBtn');
-            const filterDropdown = document.getElementById('filterDropdown');
+            // 3. Fungsi Utama Tombol Batal / Keluar
+            function handleCancelEditUB(id) {
+                const modalId = 'modalEditUB_' + id;
+                const formId = 'formEditUB_' + id;
 
-            if (filterBtn) {
-                filterBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    filterDropdown.classList.toggle('hidden');
-                });
+                // Cek apakah ada perubahan
+                if (checkChangesUB(id)) {
+                    // Jika ada perubahan, buka modal konfirmasi
+                    openDiscardConfirmation('Unit Bisnis', modalId, formId);
+                } else {
+                    // Jika tidak ada perubahan, langsung tutup
+                    closeModal(modalId, formId);
+                }
             }
 
-            // Menutup dropdown jika klik di luar
+            // Global Window Click
             window.onclick = (e) => {
                 if (e.target.id.startsWith('modal')) {
-                    closeModal(e.target.id);
+                    const idParts = e.target.id.split('_');
+
+                    // Cek apakah itu modal edit
+                    if (idParts[0] === 'modalEditUB') {
+                        const id = idParts[1];
+                        // Gunakan fungsi pengecekan yang sudah ada
+                        if (checkChangesUB(id)) {
+                            openDiscardConfirmation('Unit Bisnis', e.target.id, 'formEditUB_' + id);
+                        } else {
+                            closeModal(e.target.id, 'formEditUB_' + id);
+                        }
+                    }
+                    // Modal lain yang bukan modal konfirmasi (agar modal konfirmasi tidak tertutup saat klik isinya)
+                    else if (e.target.id !== 'editConfirmation' && e.target.id !== 'deleteConfirmationModal') {
+                        closeModal(e.target.id);
+                    }
                 }
-                if (filterDropdown && !filterBtn.contains(e.target)) {
+
+                const filterDropdown = document.getElementById('filterDropdown');
+                const filterBtn = document.getElementById('filterBtn');
+                if (filterDropdown && filterBtn && !filterBtn.contains(e.target)) {
                     filterDropdown.classList.add('hidden');
                 }
             };
 
-
-            // Fungsi untuk Modal EDIT (Dynamic ID berdasarkan Unit Bisnis)
-            function addLayananFieldEdit(id) {
-                const container = document.getElementById(`layananContainerEdit_${id}`);
-                if (!container) {
-                    console.error("Container tidak ditemukan untuk ID: " + id);
-                    return;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'flex items-center gap-2 mt-2';
-                div.innerHTML = `
-            <input type="text" name="layanan[]" form="formEditUB_${id}" placeholder="Masukkan Layanan Baru"
-                class="w-full px-4 py-3 text-xs border border-dashed border-gray-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-birua transition">
-            <button type="button" onclick="this.parentElement.remove()"
-                class="bg-birub text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-red-600 transition flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                        viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
-                                    </svg>
-            </button>
-        `;
-                container.appendChild(div);
-            }
-
-            // Fungsi untuk memicu Modal Konfirmasi Pembatalan Edit
-            function openDiscardConfirmation(contextText, modalToCloseId, formId) {
-                const discardModalId = 'editConfirmation'; // Menggunakan ID yang Anda tentukan
-                const confirmButtonId = 'confirmEditButton'; // ID tombol "Ya" dari modal yang Anda berikan
-
-                const contextSpan = document.getElementById('discardContextText'); // Asumsi ada elemen ini di partial view
-                const confirmButton = document.getElementById(confirmButtonId);
-
-                // 1. Menyimpan state modal dan form yang sedang aktif
-                lastActiveModalId = modalToCloseId;
-                formToResetId = formId;
-
-                // 2. Mengatur teks dinamis pada modal konfirmasi
-                if (contextSpan) {
-                    contextSpan.textContent = contextText;
-                }
-
-                // 3. Menampilkan modal konfirmasi pembatalan
-                const discardContentId = getModalContentId(discardModalId);
-                const modal = document.getElementById(discardModalId);
-                const content = document.getElementById(discardContentId);
-
-                if (modal && content) {
-                    modal.classList.replace('hidden', 'flex');
-                    setTimeout(() => {
-                        content.classList.replace('scale-95', 'scale-100');
-                        content.classList.replace('opacity-0', 'opacity-100');
-                    }, 10);
-                }
-
-                // 4. MENGHAPUS & Mengatur ulang fungsi tombol 'Ya' (confirmEditButton)
-                const newConfirmButton = confirmButton.cloneNode(true);
-                confirmButton.replaceWith(newConfirmButton);
-
-                newConfirmButton.onclick = function() {
-                    // A. Menutup modal konfirmasi pembatalan
-                    closeModal(discardModalId);
-
-                    if (lastActiveModalId && formToResetId) {
-                        // B. Menutup modal edit dan mereset form yang ditargetkan
-                        closeModal(lastActiveModalId, formToResetId, true);
-                    }
-
-                    // C. Membersihkan state
-                    lastActiveModalId = null;
-                    formToResetId = null;
-                };
-
-                const noButton = document.querySelector(`#${discardModalId} button.bg-red-600`);
-                if (noButton) {
-                    // Clone dan replace untuk menghindari event listener duplikat
-                    const newNoButton = noButton.cloneNode(true);
-                    noButton.replaceWith(newNoButton);
-
-                    newNoButton.onclick = function() {
-                        closeModal(discardModalId);
-                        if (lastActiveModalId) {
-                            // Membuka kembali modal edit yang sedang aktif
-                            toggleModal(lastActiveModalId);
-                        }
-                    };
-                }
-            }
+            handleCancelEditUB
         </script>
     @endsection
 </body>

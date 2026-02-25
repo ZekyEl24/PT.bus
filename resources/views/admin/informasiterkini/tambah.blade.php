@@ -34,7 +34,7 @@
                                 </svg>
                             </div>
                             <p class="text-[11px] font-medium text-gray-600">Klik untuk Unggah Foto</p>
-                            <p class="text-[9px] text-gray-400 mt-1">Format: JPG, PNG, JPEG (Maks. 2MB)</p>
+                            <p class="text-[9px] text-gray-400 mt-1">Format: JPG, PNG, JPEG (Maks. 4MB)</p>
                         </div>
                     </div>
                     <input type="file" name="gambar" id="inputFoto" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" required onchange="previewFile()">
@@ -71,12 +71,12 @@
                 <label class="block text-xs font-bold text-gray-700 mb-3">Status</label>
                 <div class="flex items-center gap-10">
                     <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="radio" name="status" value="aktif" class="w-5 h-5 accent-birua" required
+                        <input type="radio" name="status" value="aktif" class="w-5 h-5 accent-birue" required
                             {{ old('status', 'aktif') == 'aktif' ? 'checked' : '' }}>
                         <span class="text-xs font-bold text-gray-600 transition">Aktif</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="radio" name="status" value="tidak aktif" class="w-5 h-5 accent-birua"
+                        <input type="radio" name="status" value="tidak aktif" class="w-5 h-5 accent-birue"
                             {{ old('status') == 'tidak aktif' ? 'checked' : '' }}>
                         <span class="text-xs font-bold text-gray-600 transition">Tidak Aktif</span>
                     </label>

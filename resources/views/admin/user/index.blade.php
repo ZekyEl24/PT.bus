@@ -384,6 +384,95 @@
                     });
                 }
 
+                // Global state untuk menyimpan data asli Pengguna
+                let initialUserData = {};
+
+                // 1. Modifikasi fungsi toggleModal agar merekam data saat modal edit user dibuka
+                // Tambahkan pengecekan ini di dalam fungsi toggleModal Anda yang sudah ada
+                const originalToggleModalUser = toggleModal;
+                toggleModal = function(id) {
+                    originalToggleModalUser(id);
+
+                    if (id.startsWith('modalEdit_')) {
+                        const userId = id.split('_')[1];
+                        setTimeout(() => {
+                            trackInitialUserData(userId);
+                        }, 100);
+                    }
+                };
+
+                // 2. Fungsi merekam data asli dari form
+                function trackInitialUserData(id) {
+                    const form = document.getElementById('formEditUser_' + id);
+                    if (!form) return;
+
+                    const formData = new FormData(form);
+                    initialUserData[id] = {};
+
+                    formData.forEach((value, key) => {
+                        // Jangan simpan password karena defaultnya kosong di form edit
+                        if (key !== 'password' && key !== '_token' && key !== '_method') {
+                            initialUserData[id][key] = value;
+                        }
+                    });
+                }
+
+                // 3. Fungsi Cek Perubahan User (Dirty Check)
+                function checkChangesUser(id) {
+                    const form = document.getElementById('formEditUser_' + id);
+                    const btnSimpan = document.getElementById('btnSimpanUser_' + id);
+                    if (!form || !btnSimpan) return false;
+
+                    const currentData = new FormData(form);
+                    let hasChanged = false;
+
+                    for (let [key, value] of currentData.entries()) {
+                        if (key === '_token' || key === '_method' || key === 'user_id_for_edit') continue;
+
+                        // Jika password diisi, anggap ada perubahan
+                        if (key === 'password') {
+                            if (value.length > 0) {
+                                hasChanged = true;
+                                break;
+                            }
+                            continue;
+                        }
+
+                        // Cek apakah nilai input sekarang berbeda dengan nilai awal
+                        if (value !== initialUserData[id][key]) {
+                            hasChanged = true;
+                            break;
+                        }
+                    }
+
+                    // Update UI Tombol Simpan
+                    if (hasChanged) {
+                        btnSimpan.disabled = false;
+                        btnSimpan.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                        btnSimpan.classList.add('bg-birua', 'hover:opacity-90', 'cursor-pointer', 'shadow-birua/20');
+                    } else {
+                        btnSimpan.disabled = true;
+                        btnSimpan.classList.add('bg-gray-400', 'cursor-not-allowed');
+                        btnSimpan.classList.remove('bg-birua', 'hover:opacity-90', 'cursor-pointer', 'shadow-birua/20');
+                    }
+
+                    return hasChanged;
+                }
+
+                // 4. Fungsi Batal User (Hanya muncul konfirmasi jika ada perubahan)
+                function handleCancelEditUser(id) {
+                    const modalId = 'modalEdit_' + id;
+                    const formId = 'formEditUser_' + id;
+
+                    if (checkChangesUser(id)) {
+                        // Jika ada perubahan, tampilkan modal konfirmasi (seperti banner)
+                        openDiscardConfirmation('Pengguna', modalId, formId);
+                    } else {
+                        // Jika tidak ada perubahan, langsung tutup modal
+                        closeModal(modalId, formId);
+                    }
+                }
+
 
                 // ==========================================
                 // FUNGSI KONFIRMASI HAPUS KHUSUS

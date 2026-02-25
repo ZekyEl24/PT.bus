@@ -46,8 +46,8 @@ class UnitBisnisController extends Controller
         $request->validate([
             'nama_ub' => 'required|max:255',
             'deskripsi_ub' => 'required',
-            'logo_ub' => 'required|image|mimes:png,jpg,jpeg,svg|max:2048',
-            'gambar_ub' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'logo_ub' => 'required|image|mimes:png,jpg,jpeg,svg|max:4096',
+            'gambar_ub' => 'required|image|mimes:png,jpg,jpeg|max:4096',
             'link_web_ub' => 'required|url',
             'link_ig_ub' => 'required|url',
             'status' => 'required|in:aktif,tidak aktif',
@@ -98,8 +98,8 @@ class UnitBisnisController extends Controller
         $request->validate([
             'nama_ub' => 'required|max:255',
             'deskripsi_ub' => 'required',
-            'logo_ub' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
-            'gambar_ub' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+            'logo_ub' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:4096',
+            'gambar_ub' => 'nullable|image|mimes:png,jpg,jpeg|max:4096',
             'link_web_ub' => 'required|url',
             'link_ig_ub' => 'required|url',
             'status' => 'required|in:aktif,tidak aktif',

@@ -146,7 +146,7 @@
                                             {{-- Edit --}}
                                             <button onclick="toggleModal('modalEditInformasi_{{ $info->id }}')"
                                                 class="w-8 h-8 rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 transition shadow-sm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                     viewBox="0 0 24 24">
                                                     <path fill="currentColor"
                                                         d="m7 17.013l4.413-.015l9.632-9.54c.378-.378.586-.88.586-1.414s-.208-1.036-.586-1.414l-1.586-1.586c-.756-.756-2.075-.752-2.825-.003L7 12.583zM18.045 4.458l1.589 1.583l-1.597 1.582l-1.586-1.585zM9 13.417l6.03-5.973l1.586 1.586l-6.029 5.971L9 15.006z" />
@@ -158,7 +158,7 @@
                                             <button type="button"
                                                 onclick="showDeleteConfirmation('{{ route('informasiterkini.destroy', $info->id) }}')"
                                                 class="w-8 h-8 rounded-full bg-birud text-white flex items-center justify-center hover:bg-red-900 transition shadow-sm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                     viewBox="0 0 24 24">
                                                     <path fill="currentColor"
                                                         d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM8 9h8v10H8zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -171,8 +171,9 @@
                                 @include('admin.informasiterkini.edit')
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-18 text-center bg-white">
-                                        <div class="flex flex-col items-center py-10">
+                                    <td colspan="5" class="py-18 bg-white p-0"> {{-- p-0 ditambahkan agar container bisa full lebar --}}
+                                        {{-- Gunakan sticky dan left-0 agar dia selalu menempel di area yang terlihat --}}
+                                        <div class="sticky left-0 w-full flex flex-col items-center py-10">
                                             <div class="mb-4 text-gray-300">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,7 +182,7 @@
                                                 </svg>
                                             </div>
                                             <h3 class="text-gray-700 font-bold text-base">Hasil Tidak Ditemukan</h3>
-                                            <p class="text-gray-500 text-xs max-w-xs mx-auto mt-1">
+                                            <p class="text-gray-500 text-xs max-w-xs mx-auto mt-1 text-center">
                                                 Maaf, kami tidak menemukan data informasi yang sesuai.
                                             </p>
                                         </div>

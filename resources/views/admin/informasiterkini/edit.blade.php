@@ -73,15 +73,15 @@
                     <label class="block text-xs font-bold text-gray-700 mb-3">Status</label>
                     <div class="flex items-center gap-10">
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="status" value="aktif" class="w-5 h-5 accent-birua" required
+                            <input type="radio" name="status" value="aktif" class="w-5 h-5 accent-birue" required
                                 onchange="checkChanges('{{ $info->id }}')"
                                 {{ old('status', $info->status) == 'aktif' ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-600 transition">Aktif</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="status" value="nonaktif" class="w-5 h-5 accent-birua"
+                            <input type="radio" name="status" value="tidak aktif" class="w-5 h-5 accent-birue"
                                 onchange="checkChanges('{{ $info->id }}')"
-                                {{ old('status', $info->status) == 'nonaktif' ? 'checked' : '' }}>
+                                {{ old('status', $info->status) == 'tidak aktif' ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-600 transition">Tidak Aktif</span>
                         </label>
                     </div>

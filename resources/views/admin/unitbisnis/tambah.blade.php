@@ -20,7 +20,8 @@
         </div>
 
         {{-- Form Body --}}
-        <form id="formTambahUB" action="{{ route('ub.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
+        <form id="formTambahUB" action="{{ route('ub.store') }}" method="POST" enctype="multipart/form-data"
+            class="p-8">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
@@ -51,9 +52,17 @@
                             <div id="previewContainerLogo"
                                 class="w-full h-[180px] border-2 border-dashed border-gray-400/70 rounded-xl flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition relative overflow-hidden">
                                 <div id="placeholderLogo" class="flex flex-col items-center">
-                                    <i class="fa-solid fa-image-user text-4xl text-gray-300 font-light"></i>
-                                    <span class="text-[20px] text-gray-300 mt-2"><i
-                                            class="fa-solid fa-image-plus"></i></span>
+                                    <div id="placeholderUpload" class="text-center">
+                                        <div class="bg-white p-3 rounded-full shadow-sm inline-block mb-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-birua"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-[11px] font-medium text-gray-600">Klik untuk Unggah Logo</p>
+                                        <p class="text-[9px] text-gray-400 mt-1">Format: JPG, PNG, JPEG (Maks. 4MB)</p>
+                                    </div>
                                 </div>
                                 <img id="previewLogo" src="#" alt="Preview Logo"
                                     class="hidden max-w-[90%] max-h-[90%] object-contain">
@@ -64,7 +73,7 @@
                     </div>
                     <button type="button" onclick="document.getElementById('inputLogoTambah').click()"
                         class="w-full mt-4 py-3 bg-[#2D3E50] text-white text-xs font-bold rounded-lg hover:opacity-90 transition">
-                        Unggah Foto/Logo
+                        Unggah Logo
                     </button>
                 </div>
 
@@ -74,8 +83,14 @@
                     <div class="flex flex-col md:flex-row gap-4">
                         <div id="previewContainerFoto"
                             class="flex-1 h-40 border-2 border-dashed border-gray-400/70 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden">
-                            <div id="placeholderFoto" class="text-gray-300 text-4xl"><i
-                                    class="fa-solid fa-image-plus"></i></div>
+                            <div id="placeholderLogo" class="text-gray-400 flex flex-col items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span class="text-[10px]">Preview Foto</span>
+                            </div>
                             <img id="previewFoto" src="#" alt="Preview Foto"
                                 class="hidden max-w-[95%] max-h-[95%] object-contain">
                         </div>
@@ -132,14 +147,14 @@
                     <div class="flex items-center gap-8">
                         <label class="flex items-center gap-3 cursor-pointer group">
                             <input type="radio" name="status" value="aktif"
-                                class="w-5 h-5 accent-birugelapxl cursor-pointer" required
+                                class="w-5 h-5 accent-birue cursor-pointer" required
                                 {{ old('status') == 'aktif' || !old('status') ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-700">Aktif</span>
                         </label>
 
                         <label class="flex items-center gap-3 cursor-pointer group">
                             <input type="radio" name="status" value="tidak aktif"
-                                class="w-5 h-5 accent-birugelapxl cursor-pointer" required
+                                class="w-5 h-5 accent-birue cursor-pointer" required
                                 {{ old('status') == 'tidak aktif' ? 'checked' : '' }}>
                             <span class="text-xs font-bold text-gray-700">Tidak Aktif</span>
                         </label>

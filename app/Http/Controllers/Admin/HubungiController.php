@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Hubungi; // Pastikan Anda sudah membuat Model Hubungi
+use App\Models\Hubungi;
+use App\Models\ActivityLog; // Tambahkan ActivityLog
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class HubungiController extends Controller
 {
@@ -28,28 +30,50 @@ class HubungiController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg', // Batasan MB dihapus
         ]);
 
-        $data = [
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
-        ];
+        try {
+            // 1. Tampung data baru untuk pengecekan perubahan
+            $hubungi->fill($request->except('foto'));
 
-        // Logika Upload Foto
-        if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($hubungi->foto) {
-                Storage::disk('public')->delete($hubungi->foto);
+            // 2. Cek perubahan kolom teks
+            $changes = [];
+            foreach ($hubungi->getDirty() as $column => $newValue) {
+                if ($column == 'updated_at') continue;
+
+                $oldValue = $hubungi->getOriginal($column);
+
+                if ($column == 'judul') {
+                    $changes[] = "Judul \"$oldValue\" -> \"$newValue\"";
+                } elseif ($column == 'deskripsi') {
+                    $changes[] = "Deskripsi konten";
+                }
             }
 
-            // Simpan foto baru ke folder 'uploads/hubungi'
-            $path = $request->file('foto')->store('uploads/hubungi', 'public');
-            $data['foto'] = $path;
+            // 3. Logika Upload Foto
+            if ($request->hasFile('foto')) {
+                if ($hubungi->foto) {
+                    Storage::disk('public')->delete($hubungi->foto);
+                }
+
+                $path = $request->file('foto')->store('uploads/hubungi', 'public');
+                $hubungi->foto = $path;
+                $changes[] = "Foto/Gambar";
+            }
+
+            // 4. Simpan jika ada perubahan
+            if (!empty($changes)) {
+                $hubungi->save();
+
+                // Format Log: "Mengubah Deskripsi konten, Foto/Gambar di Halaman Hubungi"
+                $deskripsiDetail = "Mengubah " . implode(', ', $changes);
+                ActivityLog::simpanLog('Edit', 'Hubungi', $deskripsiDetail);
+            }
+
+            return redirect()->route('hubungi.index')->with('success_type', 'simpan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error_type', 'gagal')->withInput();
         }
-
-        $hubungi->update($data);
-
-        return redirect()->route('hubungi.index')->with('success', 'Data Hubungi berhasil diperbarui!');
     }
 }

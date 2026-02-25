@@ -74,9 +74,17 @@
                             <div id="previewContainerTambah"
                                 class="w-full h-52 border-2 border-dashed border-gray-400/70 rounded-xl p-6 flex items-center justify-center overflow-hidden bg-gray-50 hover:bg-gray-100 transition relative">
                                 <div id="placeholderTambah" class="flex flex-col items-center">
-                                    <i class="fa-solid fa-image text-4xl text-gray-300"></i>
-                                    <span class="text-[10px] text-gray-400 mt-2 font-medium italic">*Klik untuk pilih
-                                        gambar</span>
+                                    <div id="placeholderUpload" class="text-center">
+                                        <div class="bg-white p-3 rounded-full shadow-sm inline-block mb-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-birua"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-[11px] font-medium text-gray-600">Klik untuk Unggah Gambar</p>
+                                        <p class="text-[9px] text-gray-400 mt-1">Format: JPG, PNG, JPEG (Maks. 4MB)</p>
+                                    </div>
                                 </div>
                                 <img id="previewImageTambah" src="#" alt="Preview"
                                     class="hidden max-w-[90%] max-h-[90%] object-contain transition-transform">

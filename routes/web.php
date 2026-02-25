@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\AuthController;
-
+use App\Models\Profil;
+use App\Models\UnitBisnis;
+use App\Models\Banner;
+use App\Models\Hubungi;
+use App\Models\Informasi;
+use App\Models\InfoKontak;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,7 +30,14 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-    return view('app');
+    $profil = Profil::with('misi')->find(1);
+    $unitBisnis = UnitBisnis::with('layanan')->where('status', 'aktif')->get();
+    $banners = Banner::whereIn('kategori', ['utama', 'tentang kami'])->where('status', 'aktif')->get();
+    $hubungi = Hubungi::first();
+    $informasi = Informasi::where('status', 'aktif')->latest()->get();
+    $kontak = InfoKontak::first();
+
+    return view('app', compact('profil', 'unitBisnis', 'banners', 'hubungi', 'informasi', 'kontak'));
 });
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

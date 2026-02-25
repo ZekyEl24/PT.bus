@@ -14,44 +14,48 @@
                             class="flex flex-wrap items-center gap-3 w-full md:w-auto">
 
                             {{-- FILTER STATUS --}}
+                            {{-- Filter Status Dropdown --}}
                             <div class="relative">
-                                <input type="hidden" name="status" id="statusInput" value="{{ request('status', 'semua') }}">
+                                {{-- Input hidden ini sekarang di dalam form --}}
+                                <input type="hidden" name="status" id="statusInput"
+                                    value="{{ request('status', 'semua') }}">
+
                                 <button type="button" id="filterBtn"
-                                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-[10px] text-gray-600 bg-white hover:bg-gray-50">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-[10px] text-gray-600 bg-white hover:bg-gray-50 h-[34px]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        viewBox="0 0 24 24">
                                         <path fill="none" stroke="currentColor" stroke-linecap="round"
                                             stroke-linejoin="round" stroke-width="1.5" d="M4.5 7h15M7 12h10m-7 5h4" />
                                     </svg>
-                                    <span id="filterText">
-                                        {{ request('status') === 'aktif' ? 'Aktif' : (request('status') === 'tidak aktif' ? 'Tidak Aktif' : 'Semua') }}
+                                    <span id="filterText" class="capitalize">
+                                        {{ request('status') == 'tidak aktif' ? 'Tidak Aktif' : request('status', 'Semua') }}
                                     </span>
                                     <i class="fa-solid fa-chevron-down text-[10px] ml-2"></i>
                                 </button>
 
-                                {{-- DROPDOWN --}}
                                 <div id="filterDropdown"
                                     class="hidden absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                                    <button type="button" data-status="semua"
-                                        class="filter-item w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Semua</button>
-                                    <button type="button" data-status="aktif"
-                                        class="filter-item w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Aktif</button>
-                                    <button type="button" data-status="tidak aktif"
-                                        class="filter-item w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Tidak
+                                    <button type="button" onclick="updateStatus('semua')"
+                                        class="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Semua</button>
+                                    <button type="button" onclick="updateStatus('aktif')"
+                                        class="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Aktif</button>
+                                    <button type="button" onclick="updateStatus('tidak aktif')"
+                                        class="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100">Tidak
                                         Aktif</button>
                                 </div>
                             </div>
 
-                            {{-- SEARCH --}}
+                            {{-- Input Search --}}
                             <div class="relative w-full md:w-[280px]">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fa-solid fa-magnifying-glass text-[12px]"></i>
                                 </span>
-                                <input type="text" name="search" value="{{ request('search') }}"
-                                    placeholder="Cari Nama Klien..."
-                                    class="bg-white w-full py-2 pl-10 pr-4 text-[10px] border border-gray-300 rounded-lg focus:ring-1 focus:ring-kuning outline-none"
-                                    id="searchInput">
+                                <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
+                                    placeholder="Cari Berdasarkan Nama Klien" oninput="autoSearch()"
+                                    class="bg-white w-full h-[34px] pl-10 pr-4 text-[10px] border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-kuning">
                             </div>
                         </form>
+
 
                         {{-- Tombol Tambah --}}
                         <button onclick="toggleModal('modalTambah')"
@@ -88,7 +92,8 @@
                                         </td>
 
                                         {{-- Nama Klien --}}
-                                        <td class="py-4 px-6 text-center border-b border-gray-100 font-medium text-gray-700">
+                                        <td
+                                            class="py-4 px-6 text-center border-b border-gray-100 font-medium text-gray-700">
                                             {{ $kliens->nama_klien }}
                                         </td>
 
@@ -112,7 +117,8 @@
                                         <td class="py-5 px-6 text-center border-b border-gray-100">
                                             <div class="flex justify-center gap-2">
                                                 {{-- Edit --}}
-                                                <button type="button" onclick="toggleModal('modalEdit_{{ $kliens->id }}')"
+                                                <button type="button"
+                                                    onclick="toggleModal('modalEdit_{{ $kliens->id }}')"
                                                     class="w-[30px] h-[30px] rounded-full bg-kuning text-black flex items-center justify-center hover:bg-yellow-500 transition shadow-sm">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17"
                                                         viewBox="0 0 24 24">
@@ -143,8 +149,9 @@
                                         <td colspan="5" class="py-20 text-center bg-white">
                                             <div class="flex flex-col items-center text-gray-300">
                                                 <i class="fa-solid fa-magnifying-glass text-5xl mb-4"></i>
-                                                <h3 class="text-gray-700 font-bold text-base">Data Tidak Ditemukan</h3>
-                                                <p class="text-gray-500 text-xs mt-1">Belum ada data klien yang terdaftar.</p>
+                                                <h3 class="text-gray-700 font-bold text-base">Hasil Tidak Ditemukan</h3>
+                                                <p class="text-gray-500 text-xs mt-1">Belum ada data klien yang terdaftar dengan kriteria tersebut</p>
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
@@ -206,12 +213,47 @@
             @include('layout.partials.success_notification')
         </div>
 
-        {{-- SCRIPT (Gunakan script yang sama dengan User Management) --}}
+
         <script>
+            // Fungsi untuk memperbarui filter status dan submit form
+            function updateStatus(status) {
+                document.getElementById('statusInput').value = status;
+                document.getElementById('filterForm').submit();
+            }
+
+            // Fungsi untuk pencarian otomatis dengan delay (debounce) agar tidak memberatkan server
+            let searchTimer;
+
+            function autoSearch() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 800); // Submit otomatis setelah 0.8 detik berhenti mengetik
+            }
+
+            // Toggle Dropdown Filter Status
+            const filterBtn = document.getElementById('filterBtn');
+            const filterDropdown = document.getElementById('filterDropdown');
+
+            if (filterBtn) {
+                filterBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    filterDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Tutup dropdown jika klik di luar area
+            window.addEventListener('click', function(e) {
+                if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                    filterDropdown.classList.add('hidden');
+                }
+            });
+
             // 1. Global state untuk menyimpan data asli Profil Klien
             let initialKlienData = {};
             let lastActiveModalId = null;
             let formToResetId = null;
+
 
             // MODAL CORE FUNCTIONS
             function getModalContentId(modalId) {
@@ -242,6 +284,33 @@
                         const klienId = modalId.split('_')[1];
                         setTimeout(() => trackInitialKlienData(klienId), 100);
                     }
+                }
+            }
+
+            // DELETE CONFIRMATION
+            function showDeleteConfirmation(deleteUrl) {
+                const modal = document.getElementById('deleteConfirmationModal');
+                const content = document.getElementById('deleteConfirmationModalContent');
+                const deleteForm = document.getElementById('deleteForm');
+                const confirmButton = document.getElementById('confirmDeleteButton');
+
+                if (modal && content) {
+                    modal.classList.replace('hidden', 'flex');
+                    setTimeout(() => {
+                        content.classList.replace('scale-95', 'scale-100');
+                        content.classList.replace('opacity-0', 'opacity-100');
+                    }, 10);
+                }
+                deleteForm.setAttribute('action', deleteUrl);
+
+                const newConfirmButton = confirmButton.cloneNode(true);
+                confirmButton.replaceWith(newConfirmButton);
+
+                newConfirmButton.onclick = function() {
+                    closeModal('deleteConfirmationModal');
+
+                    newConfirmButton.disabled = true;
+                    deleteForm.submit();
                 }
             }
 
