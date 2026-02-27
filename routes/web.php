@@ -18,6 +18,7 @@ use App\Models\Banner;
 use App\Models\Hubungi;
 use App\Models\Informasi;
 use App\Models\InfoKontak;
+use App\Models\ProfilKlien;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,8 +37,9 @@ Route::get('/', function () {
     $hubungi = Hubungi::first();
     $informasi = Informasi::where('status', 'aktif')->latest()->get();
     $kontak = InfoKontak::first();
+    $klien = ProfilKlien::where('status', 'aktif')->latest()->get();
 
-    return view('app', compact('profil', 'unitBisnis', 'banners', 'hubungi', 'informasi', 'kontak'));
+    return view('app', compact('profil', 'unitBisnis', 'banners', 'hubungi', 'informasi', 'kontak', 'klien'));
 });
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

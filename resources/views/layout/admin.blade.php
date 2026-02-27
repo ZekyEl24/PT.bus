@@ -2,11 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Dashboard' }}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @if (isset($profil->logo))
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $profil->logo) }}">
+    @endif
     @vite('resources/css/app.css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <meta property="og:image"
+        content="{{ isset($profil->logo) ? asset('storage/' . $profil->logo) : asset('default-logo.png') }}">
 
     <style>
         /* TRANSISI HALUS UTAMA */
@@ -77,7 +82,9 @@
     @if (session('success_type'))
         <meta name="success-type" content="{{ session('success_type') }}">
     @endif
-
+    @if (session('error_type'))
+        <meta name="error-type" content="{{ session('error_type') }}">
+    @endif
 </head>
 
 <body class="bg-[#f8fafc] font-habanera">

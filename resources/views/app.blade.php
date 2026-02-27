@@ -18,23 +18,23 @@
 <body class="bg-white text-gray-900 font-sans">
 
     <nav x-data="{ scrolled: false }" x-init="scrolled = window.pageYOffset > 20" @scroll.window="scrolled = (window.pageYOffset > 20)"
-        :class="scrolled ? 'py-3 shadow-md bg-white' : 'py-5 bg-white/90'"
+        :class="scrolled ? 'py-3 shadow-md bg-white' : 'py-12 bg-white/90'"
         class="fixed w-full z-50 transition-all duration-500 ease-in-out border-b border-gray-100">
 
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center relative">
+        <div class="max-w-400 mx-auto px-6 flex justify-between items-center relative">
 
             <div class="flex items-center">
-                <div class="relative w-20 h-10 flex items-center">
+                <div class="relative h-10 flex items-center">
                     <img src="{{ asset('storage/' . $profil->logo) }}"
-                        :class="scrolled ? 'h-10 translate-y-0 static' : 'h-24 translate-y-3 absolute top-0'"
-                        class="w-auto transition-all duration-500 ease-out object-contain z-[60] max-w-none shadow-none"
+                        :class="scrolled ? 'h-10 translate-y-0 static' : 'h-40 translate-y-1 absolute top-0'"
+                        class="w-auto transition-all duration-500 ease-out object-contain z-60 max-w-none shadow-none"
                         alt="Logo">
                 </div>
 
                 <span x-show="scrolled" x-transition:enter="transition opacity ease-out duration-500"
                     x-transition:enter-start="opacity-0 -translate-x-4"
                     x-transition:enter-end="opacity-100 translate-x-0"
-                    class="ml-6 font-bold text-lg text-gray-900 tracking-tight hidden md:block">
+                    class="ml-3 font-bold text-lg text-gray-900 tracking-tight hidden md:block">
                     {{ $profil->nama_profil }}
                 </span>
             </div>
@@ -42,8 +42,8 @@
             <div class="flex items-center">
                 @if ($kontak)
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $kontak->nomer_telepon) }}" target="_blank"
-                        class="bg-black text-white px-6 py-2 rounded-full font-bold text-xs tracking-widest hover:bg-yellow-500 transition-all duration-300 shadow-sm flex items-center gap-2">
-                        KONTAK <i class="fa-brands fa-whatsapp text-lg text-green-400"></i>
+                        class=" text-black px-6 py-2 font-bold text-xs tracking-widest transition-all duration-300 gap-2">
+                        KONTAK
                     </a>
                 @endif
             </div>
@@ -88,7 +88,61 @@
         </div>
     </section>
 
-    <section id="tentang" class="py-20 font-habanera overflow-hidden" x-data="{
+    <section class="py-5 bg-white overflow-hidden">
+        <div class="relative flex items-center">
+            <div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white to-transparent z-10"></div>
+            <div class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white to-transparent z-10"></div>
+
+            <div class="animate-marquee flex items-center gap-16 md:gap-24">
+                {{-- Loop Pertama --}}
+                @foreach ($klien as $k)
+                    @if ($k->status === 'aktif')
+                        <div
+                            class="flex items-center justify-center w-32 md:w-32 h-20 transition-all duration-500">
+                            <img src="{{ asset('storage/' . $k->logo_klien) }}" alt="{{ $k->nama_klien }}"
+                                class="max-h-full max-w-full object-contain">
+                        </div>
+                    @endif
+                @endforeach
+
+                {{-- Duplikasi Loop (Wajib ada untuk efek tak terbatas/seamless) --}}
+                @foreach ($klien as $k)
+                    @if ($k->status === 'aktif')
+                        <div
+                            class="flex items-center justify-center w-32 md:w-40 h-20 transition-all duration-500">
+                            <img src="{{ asset('storage/' . $k->logo_klien) }}" alt="{{ $k->nama_klien }}"
+                                class="max-h-full max-w-full object-contain">
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+        <style>
+            /* Gunakan komentar CSS seperti ini, jangan pakai // */
+            @keyframes marquee {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+
+            .animate-marquee {
+                display: flex;
+                width: max-content;
+                /* Pastikan nama animasinya sama dengan @keyframes di atas */
+                animation: marquee 30s linear infinite;
+            }
+
+            .animate-marquee:hover {
+                animation-play-state: paused;
+            }
+        </style>
+    </section>
+
+    <section id="tentang" class="pt-5 pb-20 font-habanera overflow-hidden" x-data="{
         scrollPercent: 0,
         updateScroll(el) {
             this.scrollPercent = (el.scrollLeft / (el.scrollWidth - el.clientWidth)) * 100;

@@ -39,12 +39,12 @@
                                 <input type="radio" name="kategori" value="utama" class="w-4 h-4 accent-birue"
                                     required
                                     {{ request('kategori') == 'utama' || !request('kategori') ? 'checked' : '' }}>
-                                <span class="text-xs text-gray-700">Utama</span>
+                                <span class="text-xs text-gray-700 font-bold">Utama</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="kategori" value="tentang kami" class="w-4 h-4 accent-birue"
                                     required {{ request('kategori') == 'tentang kami' ? 'checked' : '' }}>
-                                <span class="text-xs text-gray-700">Tentang Kami</span>
+                                <span class="text-xs text-gray-700 font-bold">Tentang Kami</span>
                             </label>
                         </div>
                     </div>
@@ -56,11 +56,11 @@
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="status" value="aktif" class="w-4 h-4 accent-birue"
                                     checked>
-                                <span class="text-xs text-gray-700">Aktif</span>
+                                <span class="text-xs text-gray-700 font-bold">Aktif</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="status" value="tidak aktif" class="w-4 h-4 accent-birue">
-                                <span class="text-xs text-gray-700">Tidak Aktif</span>
+                                <span class="text-xs text-gray-700 font-bold">Tidak Aktif</span>
                             </label>
                         </div>
                     </div>
